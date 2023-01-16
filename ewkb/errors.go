@@ -9,6 +9,9 @@ const (
 
 	// ErrIncompatibleFormat occurs when geometry formats are incompatible.
 	ErrIncompatibleFormat = Error("incompatible format")
+
+	// ErrWrongGeometryType occurs when geometry type is not the expected one.
+	ErrWrongGeometryType = Error("wrong geometry type")
 )
 
 func (e Error) Error() string {

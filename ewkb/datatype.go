@@ -16,7 +16,7 @@ func (p *point) read(dataStream io.Reader, size uint32, byteOrder binary.ByteOrd
 			return err
 		}
 
-		out[idx] = Float64FromBytes(floatBytes, byteOrder)
+		out[idx] = float64FromBytes(floatBytes, byteOrder)
 	}
 
 	*p = out

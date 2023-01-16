@@ -42,18 +42,7 @@ func (l Layout) Format() string {
 
 // Size is the number of coordinates in the layout.
 func (l Layout) Size() uint32 {
-	switch l {
-	case layoutXY:
-		return 2 //nolint: gomnd
-	case layoutXYM:
-		return 3 //nolint: gomnd
-	case layoutXYZ:
-		return 3 //nolint: gomnd
-	case layoutXYZM:
-		return 4 //nolint: gomnd
-	}
-
-	return 0
+	return uint32(len(l.Format()))
 }
 
 // Uint32 convert layout in uint32.

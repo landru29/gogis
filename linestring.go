@@ -9,13 +9,24 @@ import (
 // Linestring is LINESTRING in database.
 type Linestring []Point
 
-// NullLinestring is a nullable value of Linestring.
+// NullLinestring represents a Linestring that may be null.
+// NullLinestring implements the SQL driver.Scanner interface so it
+// can be used as a scan destination:
+//
+//	var line gogis.NullLinestring
+//	err := db.QueryRow("SELECT coordinate FROM foo WHERE id=?", id).Scan(&line)
+//	...
+//	if line.Valid {
+//	   // use line.Linestring
+//	} else {
+//	   // NULL value
+//	}
 type NullLinestring struct {
 	Linestring Linestring
 	Valid      bool
 }
 
-// Scan is the implementation of sql driver.
+// Scan implements the SQL driver.Scanner interface.
 func (l *NullLinestring) Scan(value interface{}) error {
 	if value == nil {
 		return nil
@@ -39,7 +50,7 @@ func (l *NullLinestring) Scan(value interface{}) error {
 	return nil
 }
 
-// Scan is the implementation of sql driver.
+// Scan implements the SQL driver.Scanner interface.
 func (l *Linestring) Scan(value interface{}) error {
 	linestring := ewkb.Linestring{}
 
