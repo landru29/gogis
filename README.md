@@ -51,11 +51,11 @@ func main() {
 
 ## Implements your own type
 
-It's quite easy to implements your own type, based on `Extended Well Known Byte` format.
+It's quite easy to implement your own type, based on `Extended Well Known Byte` format.
 
 ### Implementations on EWKB level
 
-First implements the following interfaces:
+First implement the following:
 
 ```golang
 type Custom struct {}
@@ -79,7 +79,7 @@ func (c Custom) Type() ewkb.GeometryType {
 
 ### Implementations on Database level
 
-Now you just have to implements the following:
+Now, you just have to implement the following:
 
 ```golang
 type CustomSQL Custom
