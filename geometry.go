@@ -22,6 +22,7 @@ func NewGeometry(opts ...func(*Geometry)) *Geometry {
 		wellknown: []ewkb.Geometry{
 			&ewkb.Point{},
 			&ewkb.Linestring{},
+			&ewkb.Polygon{},
 		},
 	}
 
