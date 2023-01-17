@@ -13,12 +13,17 @@ func (l Linestring) Type() GeometryType {
 
 // UnmarshalEWBK implements the Unmarshaler interface.
 func (l *Linestring) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
+	if record.Type != l.Type() {
+		return ErrWrongGeometryType
+	}
+
 	size, err := record.ReadUint32()
 	if err != nil {
 		return err
 	}
 
 	l.SRID = record.SRID
+	record.Type = GeometryTypePoint
 
 	l.Points = make([]Point, size)
 	for idx := range l.Points {

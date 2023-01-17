@@ -35,9 +35,6 @@ package ewkb
 // SystemReferenceID is the identifier of the system reference for projection.
 type SystemReferenceID uint32
 
-// GeometryType is the type of the geometry (bits 0-61 of the bytes 1-4 of the header).
-type GeometryType uint8
-
 const (
 	// SystemReferenceWGS84 stands for GCS WGS 84.
 	SystemReferenceWGS84 SystemReferenceID = 4326
@@ -47,36 +44,6 @@ const (
 
 	// SystemReferenceTennesseeZone stands for SPCS Tennessee Zone NAD 83.
 	SystemReferenceTennesseeZone SystemReferenceID = 6576
-
-	// GeometryTypePoint stands for point.
-	GeometryTypePoint GeometryType = 1
-
-	// GeometryTypeLineString stands for lineString.
-	GeometryTypeLineString GeometryType = 2
-
-	// GeometryTypePolygon stands for polygon.
-	GeometryTypePolygon GeometryType = 3
-
-	// GeometryTypeMultiPoint stands for multiPoint.
-	GeometryTypeMultiPoint GeometryType = 4
-
-	// GeometryTypeMultiLineString stands for multiLineString.
-	GeometryTypeMultiLineString GeometryType = 5
-
-	// GeometryTypeMultiPolygon stands for multiPolygon.
-	GeometryTypeMultiPolygon GeometryType = 6
-
-	// GeometryTypeGeometryCollection stands for geometryCollection.
-	GeometryTypeGeometryCollection GeometryType = 7
-
-	// GeometryTypePolyhedralSurface stands for polyhedralSurface.
-	GeometryTypePolyhedralSurface GeometryType = 15
-
-	// GeometryTypeTin stands for tin.
-	GeometryTypeTin GeometryType = 16
-
-	// GeometryTypeTriangle stands for triangle.
-	GeometryTypeTriangle GeometryType = 17
 )
 
 // Unmarshaler is the byte array to Geometry converter.
@@ -92,13 +59,6 @@ type Marshaler interface {
 
 	// Header builds a header record (used to generate the first bytes of the EWKB).
 	Header() ExtendedWellKnownBytesHeader
-}
-
-// Geometry is a geometrical shape.
-type Geometry interface {
-	Type() GeometryType
-	Unmarshaler
-	Marshaler
 }
 
 // WithSRID converts SystemReferenceID to pointer.

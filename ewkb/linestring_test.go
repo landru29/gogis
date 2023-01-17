@@ -46,7 +46,7 @@ func TestLinestringUnmarshalEWBK(t *testing.T) {
 		})
 	})
 
-	/*t.Run("XYZ", func(t *testing.T) {
+	t.Run("XYZ", func(t *testing.T) {
 		var linestring ewkb.Linestring
 
 		err := (&linestring).UnmarshalEWBK(
@@ -96,7 +96,23 @@ func TestLinestringUnmarshalEWBK(t *testing.T) {
 			'x': 5,
 			'y': 6,
 		})
-	})*/
+	})
+	t.Run("wrong type", func(t *testing.T) {
+		var linestring ewkb.Linestring
+
+		err := (&linestring).UnmarshalEWBK(
+			newExtendedWellKnownBytes(
+				t,
+				"020000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040",
+				withLayout(ewkb.Layout(3)),
+				withByteOrder(binary.LittleEndian),
+				withSRID(ewkb.SystemReferenceWGS84),
+				withType(ewkb.GeometryTypeTin),
+			),
+		)
+		require.Error(t, err)
+		assert.ErrorIs(t, ewkb.ErrWrongGeometryType, err)
+	})
 }
 
 func TestLinestringMarshalEWBK(t *testing.T) {

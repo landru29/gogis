@@ -15,6 +15,10 @@ func (p Point) Type() GeometryType {
 
 // UnmarshalEWBK implements the Unmarshaler interface.
 func (p *Point) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
+	if record.Type != p.Type() {
+		return ErrWrongGeometryType
+	}
+
 	var pnt point
 
 	if err := (&pnt).read(record.DataStream, record.Layout.Size(), record.ByteOrder); err != nil {

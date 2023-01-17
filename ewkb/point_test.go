@@ -79,6 +79,23 @@ func TestPointUnmarshalEWBK(t *testing.T) {
 			'y': 48.432044,
 		})
 	})
+
+	t.Run("wrong type", func(t *testing.T) {
+		var point ewkb.Point
+
+		err := (&point).UnmarshalEWBK(
+			newExtendedWellKnownBytes(
+				t,
+				"3CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40",
+				withLayout(ewkb.Layout(3)),
+				withByteOrder(binary.LittleEndian),
+				withSRID(ewkb.SystemReferenceWGS84),
+				withType(ewkb.GeometryTypeTin),
+			),
+		)
+		require.Error(t, err)
+		assert.ErrorIs(t, ewkb.ErrWrongGeometryType, err)
+	})
 }
 
 func TestPointMarshalEWBK(t *testing.T) {
