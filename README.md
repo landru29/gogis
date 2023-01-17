@@ -4,14 +4,11 @@ This package is an implementation of the PostGis database driver.
 
 ## Example
 
-```sql
-CREATE TABLE IF NOT EXISTS points (
-    coordinate GEOMETRY
-);
-```
-
 ```golang
 func main() {
+	// CREATE TABLE IF NOT EXISTS points (
+    //   coordinate GEOMETRY
+	// );
 	ctx := context.Background()
 
 	// Connect to database
