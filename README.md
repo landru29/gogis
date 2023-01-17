@@ -1,6 +1,6 @@
 # gogis
 
-This package is an implementation of the PostGis database driver.
+This package is an implementation of the PostGis database driver. Refer to documentation [https://pkg.go.dev/github.com/landru29/gogis](https://pkg.go.dev/github.com/landru29/gogis)
 
 ## Example
 
