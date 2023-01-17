@@ -141,7 +141,7 @@ func Example_insertPoint() {
 	// Execute the query.
 	if _, err = stmt.ExecContext(ctx,
 		gogis.Point{
-			Coordinates: map[byte]float64{
+			Coordinate: ewkb.Coordinate{
 				'x': 42.42,
 				'y': 24.24,
 			},
@@ -184,14 +184,14 @@ func Example_insertLinestring() {
 	if _, err = stmt.ExecContext(ctx,
 		gogis.Linestring{
 			{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': 42.42,
 					'y': 24.24,
 				},
 				SRID: ewkb.WithSRID(ewkb.SystemReferenceWGS84),
 			},
 			{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': 10,
 					'y': 30,
 				},

@@ -38,7 +38,7 @@ func (p *NullPoint) Scan(value interface{}) error {
 	}
 
 	p.Point = Point(point)
-	p.Valid = true
+	p.Valid = !p.Point.Coordinate.IsNull()
 
 	return nil
 }

@@ -1,9 +1,11 @@
 package ewkb
 
+import "encoding/binary"
+
 // Linestring is a set of lines.
 type Linestring struct {
-	SRID   *SystemReferenceID
-	Points []Point
+	SRID *SystemReferenceID
+	CoordinateSet
 }
 
 // Type implements the Geometry interface.
@@ -17,56 +19,30 @@ func (l *Linestring) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 		return ErrWrongGeometryType
 	}
 
-	size, err := record.ReadUint32()
-	if err != nil {
-		return err
-	}
-
 	l.SRID = record.SRID
-	record.Type = GeometryTypePoint
 
-	l.Points = make([]Point, size)
-	for idx := range l.Points {
-		err := (&(l.Points[idx])).UnmarshalEWBK(record)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return l.CoordinateSet.UnmarshalEWBK(record)
 }
 
 // MarshalEWBK implements the Marshaler interface.
 func (l Linestring) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
-	output := []byte{}
-
-	size := make([]byte, size32bit)
-
-	header.ByteOrder.PutUint32(size, uint32(len(l.Points)))
-	output = append(output, size...)
-
-	for _, point := range l.Points {
-		dataByte, err := point.MarshalEWBK(header)
-		if err != nil {
-			return nil, err
-		}
-
-		output = append(output, dataByte...)
-	}
-
-	return output, nil
+	return l.CoordinateSet.MarshalEWBK(header)
 }
 
 // Header implements the Marshaler interface.
 func (l Linestring) Header() ExtendedWellKnownBytesHeader {
-	var header ExtendedWellKnownBytesHeader
+	indexes := []byte{}
 
-	if len(l.Points) > 0 {
-		header = l.Points[0].Header()
+	if len(l.CoordinateSet) > 0 {
+		for idx := range l.CoordinateSet[0] {
+			indexes = append(indexes, idx)
+		}
 	}
 
-	header.SRID = l.SRID
-	header.Type = GeometryTypeLineString
-
-	return header
+	return ExtendedWellKnownBytesHeader{
+		Type:      l.Type(),
+		Layout:    newLayoutFrom(indexes),
+		ByteOrder: binary.LittleEndian,
+		SRID:      l.SRID,
+	}
 }

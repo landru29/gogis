@@ -23,3 +23,13 @@ func (p *point) read(dataStream io.Reader, size uint32, byteOrder binary.ByteOrd
 
 	return nil
 }
+
+func (p point) isNull() bool {
+	for _, value := range p {
+		if value != value {
+			return true
+		}
+	}
+
+	return false
+}

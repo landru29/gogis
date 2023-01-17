@@ -30,27 +30,27 @@ func TestPolygonUnmarshalEWBK(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		assert.Len(t, polygon.Rings, 1)
-		assert.Len(t, polygon.Rings[0].Points, 4)
-		assert.Equal(t, polygon.Rings[0].Points[0].Coordinates, map[byte]float64{
+		assert.Len(t, polygon.CoordinateGroup, 1)
+		assert.Len(t, polygon.CoordinateGroup[0], 4)
+		assert.Equal(t, polygon.CoordinateGroup[0][0], ewkb.Coordinate{
 			'x': -71.42,
 			'y': 42.71,
 			'z': 4,
 			'm': 5,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[1].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][1], ewkb.Coordinate{
 			'x': -17.42,
 			'y': 42.17,
 			'z': 4,
 			'm': 5,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[2].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][2], ewkb.Coordinate{
 			'x': -17.42,
 			'y': 71.17,
 			'z': 4,
 			'm': 5,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[3].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][3], ewkb.Coordinate{
 			'x': -71.42,
 			'y': 42.71,
 			'z': 4,
@@ -72,24 +72,24 @@ func TestPolygonUnmarshalEWBK(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		assert.Len(t, polygon.Rings, 1)
-		assert.Len(t, polygon.Rings[0].Points, 4)
-		assert.Equal(t, polygon.Rings[0].Points[0].Coordinates, map[byte]float64{
+		assert.Len(t, polygon.CoordinateGroup, 1)
+		assert.Len(t, polygon.CoordinateGroup[0], 4)
+		assert.Equal(t, polygon.CoordinateGroup[0][0], ewkb.Coordinate{
 			'x': -71.42,
 			'y': 42.71,
 			'z': 4,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[1].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][1], ewkb.Coordinate{
 			'x': -17.42,
 			'y': 42.17,
 			'z': 4,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[2].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][2], ewkb.Coordinate{
 			'x': -17.42,
 			'y': 71.17,
 			'z': 4,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[3].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][3], ewkb.Coordinate{
 			'x': -71.42,
 			'y': 42.71,
 			'z': 4,
@@ -110,21 +110,21 @@ func TestPolygonUnmarshalEWBK(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		assert.Len(t, polygon.Rings, 1)
-		assert.Len(t, polygon.Rings[0].Points, 4)
-		assert.Equal(t, polygon.Rings[0].Points[0].Coordinates, map[byte]float64{
+		assert.Len(t, polygon.CoordinateGroup, 1)
+		assert.Len(t, polygon.CoordinateGroup[0], 4)
+		assert.Equal(t, polygon.CoordinateGroup[0][0], ewkb.Coordinate{
 			'x': -71.42,
 			'y': 42.71,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[1].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][1], ewkb.Coordinate{
 			'x': -17.42,
 			'y': 42.17,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[2].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][2], ewkb.Coordinate{
 			'x': -17.42,
 			'y': 71.17,
 		})
-		assert.Equal(t, polygon.Rings[0].Points[3].Coordinates, map[byte]float64{
+		assert.Equal(t, polygon.CoordinateGroup[0][3], ewkb.Coordinate{
 			'x': -71.42,
 			'y': 42.71,
 		})
@@ -151,41 +151,31 @@ func TestPolygonUnmarshalEWBK(t *testing.T) {
 func TestPolygonMarshalEWBK(t *testing.T) {
 	t.Run("XYZM", func(t *testing.T) {
 		polygon := ewkb.Polygon{
-			Rings: []ewkb.Linestring{
+			CoordinateGroup: ewkb.CoordinateGroup{
 				{
-					Points: []ewkb.Point{
-						{
-							Coordinates: map[byte]float64{
-								'x': -71.42,
-								'y': 42.71,
-								'z': 4,
-								'm': 5,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -17.42,
-								'y': 42.17,
-								'z': 4,
-								'm': 5,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -17.42,
-								'y': 71.17,
-								'z': 4,
-								'm': 5,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -71.42,
-								'y': 42.71,
-								'z': 4,
-								'm': 5,
-							},
-						},
+					{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
+						'm': 5,
+					},
+					{
+						'x': -17.42,
+						'y': 42.17,
+						'z': 4,
+						'm': 5,
+					},
+					{
+						'x': -17.42,
+						'y': 71.17,
+						'z': 4,
+						'm': 5,
+					},
+					{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
+						'm': 5,
 					},
 				},
 			},
@@ -209,37 +199,27 @@ func TestPolygonMarshalEWBK(t *testing.T) {
 
 	t.Run("XYZ", func(t *testing.T) {
 		polygon := ewkb.Polygon{
-			Rings: []ewkb.Linestring{
+			CoordinateGroup: ewkb.CoordinateGroup{
 				{
-					Points: []ewkb.Point{
-						{
-							Coordinates: map[byte]float64{
-								'x': -71.42,
-								'y': 42.71,
-								'z': 4,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -17.42,
-								'y': 42.17,
-								'z': 4,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -17.42,
-								'y': 71.17,
-								'z': 4,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -71.42,
-								'y': 42.71,
-								'z': 4,
-							},
-						},
+					{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
+					},
+					{
+						'x': -17.42,
+						'y': 42.17,
+						'z': 4,
+					},
+					{
+						'x': -17.42,
+						'y': 71.17,
+						'z': 4,
+					},
+					{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
 					},
 				},
 			},
@@ -263,33 +243,23 @@ func TestPolygonMarshalEWBK(t *testing.T) {
 
 	t.Run("XY", func(t *testing.T) {
 		polygon := ewkb.Polygon{
-			Rings: []ewkb.Linestring{
+			CoordinateGroup: ewkb.CoordinateGroup{
 				{
-					Points: []ewkb.Point{
-						{
-							Coordinates: map[byte]float64{
-								'x': -71.42,
-								'y': 42.71,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -17.42,
-								'y': 42.17,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -17.42,
-								'y': 71.17,
-							},
-						},
-						{
-							Coordinates: map[byte]float64{
-								'x': -71.42,
-								'y': 42.71,
-							},
-						},
+					{
+						'x': -71.42,
+						'y': 42.71,
+					},
+					{
+						'x': -17.42,
+						'y': 42.17,
+					},
+					{
+						'x': -17.42,
+						'y': 71.17,
+					},
+					{
+						'x': -71.42,
+						'y': 42.71,
 					},
 				},
 			},

@@ -3,6 +3,7 @@ package ewkb
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 	"math"
 )
 
@@ -82,7 +83,7 @@ func (e ExtendedWellKnownBytes) Marshal() []byte {
 }
 
 // DecodeHeader decodes EWKB header.
-func DecodeHeader(data interface{}) (*ExtendedWellKnownBytes, error) {
+func DecodeHeader( /*data interface{}*/ reader io.Reader) (*ExtendedWellKnownBytes, error) {
 	if data == nil {
 		return &ExtendedWellKnownBytes{IsNil: true}, nil
 	}

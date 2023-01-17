@@ -31,7 +31,7 @@ func TestPointUnmarshalEWBK(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		assert.Equal(t, point.Coordinates, map[byte]float64{
+		assert.Equal(t, point.Coordinate, ewkb.Coordinate{
 			'x': -71.060316,
 			'y': 48.432044,
 			'z': 10,
@@ -53,7 +53,7 @@ func TestPointUnmarshalEWBK(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		assert.Equal(t, point.Coordinates, map[byte]float64{
+		assert.Equal(t, point.Coordinate, ewkb.Coordinate{
 			'x': -71.060316,
 			'y': 48.432044,
 			'z': 10,
@@ -74,7 +74,7 @@ func TestPointUnmarshalEWBK(t *testing.T) {
 			),
 		)
 		require.NoError(t, err)
-		assert.Equal(t, point.Coordinates, map[byte]float64{
+		assert.Equal(t, point.Coordinate, ewkb.Coordinate{
 			'x': -71.060316,
 			'y': 48.432044,
 		})
@@ -101,7 +101,7 @@ func TestPointUnmarshalEWBK(t *testing.T) {
 func TestPointMarshalEWBK(t *testing.T) {
 	t.Run("XYZM", func(t *testing.T) {
 		point := ewkb.Point{
-			Coordinates: map[byte]float64{
+			Coordinate: ewkb.Coordinate{
 				'x': -71.060316,
 				'y': 48.432044,
 				'z': 10,
@@ -127,7 +127,7 @@ func TestPointMarshalEWBK(t *testing.T) {
 
 	t.Run("XYZ", func(t *testing.T) {
 		point := ewkb.Point{
-			Coordinates: map[byte]float64{
+			Coordinate: ewkb.Coordinate{
 				'x': -71.060316,
 				'y': 48.432044,
 				'z': 10,
@@ -152,7 +152,7 @@ func TestPointMarshalEWBK(t *testing.T) {
 
 	t.Run("XY", func(t *testing.T) {
 		point := ewkb.Point{
-			Coordinates: map[byte]float64{
+			Coordinate: ewkb.Coordinate{
 				'x': -71.060316,
 				'y': 48.432044,
 			},
@@ -189,7 +189,7 @@ func TestPointUnmarshal(t *testing.T) {
 			strGeometry: "POINT ZM(-71.060316 48.432044 10 30)",
 			binary:      "01010000C03CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40",
 			expected: &ewkb.Point{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -203,7 +203,7 @@ func TestPointUnmarshal(t *testing.T) {
 			binary:      "01010000E0E61000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40",
 			expected: &ewkb.Point{
 				SRID: &srid,
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -216,7 +216,7 @@ func TestPointUnmarshal(t *testing.T) {
 			strGeometry: "POINT Z(-71.060316 48.432044 10)",
 			binary:      "01010000803CDBA337DCC351C06D37C1374D3748400000000000002440",
 			expected: &ewkb.Point{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -229,7 +229,7 @@ func TestPointUnmarshal(t *testing.T) {
 			binary:      "01010000A0E61000003CDBA337DCC351C06D37C1374D3748400000000000002440",
 			expected: &ewkb.Point{
 				SRID: &srid,
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -241,7 +241,7 @@ func TestPointUnmarshal(t *testing.T) {
 			strGeometry: "POINT (-71.060316 48.432044)",
 			binary:      "01010000003CDBA337DCC351C06D37C1374D374840",
 			expected: &ewkb.Point{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 				},
@@ -253,7 +253,7 @@ func TestPointUnmarshal(t *testing.T) {
 			binary:      "0101000020E61000003CDBA337DCC351C06D37C1374D374840",
 			expected: &ewkb.Point{
 				SRID: &srid,
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 				},
@@ -285,7 +285,7 @@ func TestPointMarshal(t *testing.T) {
 			strGeometry: "POINT ZM(-71.060316 48.432044 10 30)",
 			expected:    "01010000C03CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40",
 			geometry: &ewkb.Point{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -298,7 +298,7 @@ func TestPointMarshal(t *testing.T) {
 			expected:    "01010000E0E61000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40",
 			geometry: &ewkb.Point{
 				SRID: &srid,
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -310,7 +310,7 @@ func TestPointMarshal(t *testing.T) {
 			strGeometry: "POINT Z(-71.060316 48.432044 10)",
 			expected:    "01010000803CDBA337DCC351C06D37C1374D3748400000000000002440",
 			geometry: &ewkb.Point{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -322,7 +322,7 @@ func TestPointMarshal(t *testing.T) {
 			expected:    "01010000A0E61000003CDBA337DCC351C06D37C1374D3748400000000000002440",
 			geometry: &ewkb.Point{
 				SRID: &srid,
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 					'z': 10.0,
@@ -333,7 +333,7 @@ func TestPointMarshal(t *testing.T) {
 			strGeometry: "POINT (-71.060316 48.432044)",
 			expected:    "01010000003CDBA337DCC351C06D37C1374D374840",
 			geometry: &ewkb.Point{
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 				},
@@ -344,7 +344,7 @@ func TestPointMarshal(t *testing.T) {
 			expected:    "0101000020E61000003CDBA337DCC351C06D37C1374D374840",
 			geometry: &ewkb.Point{
 				SRID: &srid,
-				Coordinates: map[byte]float64{
+				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
 				},

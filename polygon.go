@@ -38,12 +38,12 @@ func (l *NullPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	ringSet := make([]Linestring, len(polygon.Rings))
+	ringSet := make([]Linestring, len(polygon.CoordinateGroup))
 
-	for idx0, ring := range polygon.Rings {
-		pointSet := make([]Point, len(ring.Points))
-		for idx1, pnt := range ring.Points {
-			pointSet[idx1] = Point(pnt)
+	for idx0, ring := range polygon.CoordinateGroup {
+		pointSet := make([]Point, len(ring))
+		for idx1, pnt := range ring {
+			pointSet[idx1].Coordinate = pnt
 		}
 		ringSet[idx0] = Linestring(pointSet)
 	}
@@ -62,12 +62,12 @@ func (l *Polygon) Scan(value interface{}) error {
 		return err
 	}
 
-	ringSet := make([]Linestring, len(polygon.Rings))
+	ringSet := make([]Linestring, len(polygon.CoordinateGroup))
 
-	for idx0, ring := range polygon.Rings {
-		pointSet := make([]Point, len(ring.Points))
-		for idx1, pnt := range ring.Points {
-			pointSet[idx1] = Point(pnt)
+	for idx0, ring := range polygon.CoordinateGroup {
+		pointSet := make([]Point, len(ring))
+		for idx1, pnt := range ring {
+			pointSet[idx1].Coordinate = pnt
 		}
 		ringSet[idx0] = Linestring(pointSet)
 	}
@@ -82,14 +82,14 @@ func (l Polygon) Value() (driver.Value, error) {
 	var srid *ewkb.SystemReferenceID
 
 	polygon := ewkb.Polygon{
-		Rings: make([]ewkb.Linestring, len(l)),
+		CoordinateGroup: make(ewkb.CoordinateGroup, len(l)),
 	}
 
 	for idx0, ring := range l {
-		polygon.Rings[idx0].Points = make([]ewkb.Point, len(ring))
+		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
 		for idx1, pnt := range ring {
 			srid = pnt.SRID
-			polygon.Rings[idx0].Points[idx1] = ewkb.Point(pnt)
+			polygon.CoordinateGroup[idx0][idx1] = pnt.Coordinate
 		}
 	}
 
