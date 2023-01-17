@@ -59,9 +59,6 @@ type Marshaler interface {
 	// MarshalEWBK must only generate the data part of the EWKB (not the header part).
 	MarshalEWBK(binary.ByteOrder) ([]byte, error)
 
-	// Header builds a header record (used to generate the first bytes of the EWKB).
-	Header() ExtendedWellKnownBytesHeader
-
 	// SystemReferenceID is the optional SRID.
 	SystemReferenceID() *SystemReferenceID
 
@@ -77,7 +74,7 @@ func WithSRID(srid SystemReferenceID) *SystemReferenceID {
 	return &srid
 }
 
-// IsEWKB checks if data is pententially Extended Well Known Bytes.
+// IsEWKB checks if data is potentially Extended Well Known Bytes.
 func IsEWKB(data interface{}) bool {
 	if strData, ok := data.(string); ok {
 		return IsEWKB([]byte(strData))

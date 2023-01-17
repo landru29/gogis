@@ -2,7 +2,7 @@ package ewkb
 
 import "encoding/binary"
 
-// Point is a lat lng position in database.
+// Point is a POINT in database.
 type Point struct {
 	SRID *SystemReferenceID
 	Coordinate
@@ -31,21 +31,6 @@ func (p *Point) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 // MarshalEWBK implements the Marshaler interface.
 func (p Point) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
 	return p.Coordinate.MarshalEWBK(byteOrder)
-}
-
-// Header implements the Marshaler interface.
-func (p Point) Header() ExtendedWellKnownBytesHeader {
-	indexes := []byte{}
-	for idx := range p.Coordinate {
-		indexes = append(indexes, idx)
-	}
-
-	return ExtendedWellKnownBytesHeader{
-		Type:      p.Type(),
-		Layout:    newLayoutFrom(indexes),
-		ByteOrder: binary.LittleEndian,
-		SRID:      p.SRID,
-	}
 }
 
 // SystemReferenceID implements the Marshaler interface.

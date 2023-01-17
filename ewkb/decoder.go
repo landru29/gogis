@@ -16,6 +16,7 @@ const (
 	ewkbM    uint32 = 0x40000000
 	ewkbSRID uint32 = 0x20000000
 
+	size8bit  = 1
 	size32bit = 4
 	size64bit = 8
 )
@@ -57,7 +58,7 @@ func (e ExtendedWellKnownBytes) ReadFloat64() (float64, error) {
 
 // DecodeHeader decodes EWKB header.
 func DecodeHeader(reader io.Reader) (*ExtendedWellKnownBytes, error) {
-	var firstByte = make([]byte, 1)
+	var firstByte = make([]byte, size8bit)
 	_, err := reader.Read(firstByte)
 	if err == io.EOF {
 		return &ExtendedWellKnownBytes{IsNil: true}, nil
@@ -77,7 +78,7 @@ func DecodeHeader(reader io.Reader) (*ExtendedWellKnownBytes, error) {
 		return nil, ErrWrongByteOrder
 	}
 
-	var controlByte = make([]byte, 4)
+	var controlByte = make([]byte, size32bit)
 	if _, err := reader.Read(controlByte); err != nil {
 		return nil, err
 	}

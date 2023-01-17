@@ -28,24 +28,6 @@ func (p Polygon) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
 	return p.CoordinateGroup.MarshalEWBK(byteOrder)
 }
 
-// Header implements the Marshaler interface.
-func (p Polygon) Header() ExtendedWellKnownBytesHeader {
-	indexes := []byte{}
-
-	if len(p.CoordinateGroup) > 0 && len(p.CoordinateGroup[0]) > 0 {
-		for idx1 := range p.CoordinateGroup[0][0] {
-			indexes = append(indexes, idx1)
-		}
-	}
-
-	return ExtendedWellKnownBytesHeader{
-		Type:      p.Type(),
-		Layout:    newLayoutFrom(indexes),
-		ByteOrder: binary.LittleEndian,
-		SRID:      p.SRID,
-	}
-}
-
 // SystemReferenceID implements the Marshaler interface.
 func (p Polygon) SystemReferenceID() *SystemReferenceID {
 	return p.SRID
