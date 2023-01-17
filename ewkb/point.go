@@ -29,8 +29,8 @@ func (p *Point) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 }
 
 // MarshalEWBK implements the Marshaler interface.
-func (p Point) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
-	return p.Coordinate.MarshalEWBK(header)
+func (p Point) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
+	return p.Coordinate.MarshalEWBK(byteOrder)
 }
 
 // Header implements the Marshaler interface.
@@ -46,4 +46,14 @@ func (p Point) Header() ExtendedWellKnownBytesHeader {
 		ByteOrder: binary.LittleEndian,
 		SRID:      p.SRID,
 	}
+}
+
+// SystemReferenceID implements the Marshaler interface.
+func (p Point) SystemReferenceID() *SystemReferenceID {
+	return p.SRID
+}
+
+// Layout implements the Marshaler interface.
+func (p Point) Layout() Layout {
+	return p.Coordinate.Layout()
 }

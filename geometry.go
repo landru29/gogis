@@ -1,7 +1,9 @@
 package gogis
 
 import (
+	"bytes"
 	"database/sql/driver"
+	"encoding/hex"
 
 	"github.com/landru29/gogis/ewkb"
 )
@@ -50,7 +52,20 @@ func (g *Geometry) Scan(value interface{}) error {
 		return nil
 	}
 
-	record, err := ewkb.DecodeHeader(value)
+	if strData, ok := value.(string); ok {
+		return g.Scan([]byte(strData))
+	}
+
+	dataByte, ok := value.([]byte)
+	if !ok {
+		return ewkb.ErrIncompatibleFormat
+	}
+
+	record, err := ewkb.DecodeHeader(
+		hex.NewDecoder(
+			bytes.NewBuffer(dataByte),
+		),
+	)
 	if err != nil {
 		return err
 	}

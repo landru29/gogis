@@ -181,14 +181,7 @@ func TestPolygonMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := polygon.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(3)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypePolygon),
-			),
-		)
+		data, err := polygon.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,
@@ -225,14 +218,7 @@ func TestPolygonMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := polygon.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(2)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypePolygon),
-			),
-		)
+		data, err := polygon.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,
@@ -265,14 +251,7 @@ func TestPolygonMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := polygon.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(0)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypePolygon),
-			),
-		)
+		data, err := polygon.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,

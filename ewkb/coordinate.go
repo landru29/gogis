@@ -1,6 +1,9 @@
 package ewkb
 
-import "math"
+import (
+	"encoding/binary"
+	"math"
+)
 
 // Coordinate is coordinate system.
 type Coordinate map[byte]float64
@@ -49,15 +52,25 @@ func (c *Coordinate) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 }
 
 // MarshalEWBK implements the Marshaler interface.
-func (c Coordinate) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
+func (c Coordinate) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
 	output := []byte{}
 
-	for _, name := range header.Layout.Format() {
-		bytes := float64Bytes(c[byte(name)], header.ByteOrder)
+	for _, name := range c.Layout().Format() {
+		bytes := float64Bytes(c[byte(name)], byteOrder)
 		output = append(output, bytes...)
 	}
 
 	return output, nil
+}
+
+// Layout implements the Marshaler interface.
+func (c Coordinate) Layout() Layout {
+	indexes := []byte{}
+	for idx := range c {
+		indexes = append(indexes, idx)
+	}
+
+	return newLayoutFrom(indexes)
 }
 
 // CoordinateSet is a set of coordinates.
@@ -82,16 +95,16 @@ func (c *CoordinateSet) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 }
 
 // MarshalEWBK implements the Marshaler interface.
-func (c CoordinateSet) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
+func (c CoordinateSet) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
 	output := []byte{}
 
 	size := make([]byte, size32bit)
 
-	header.ByteOrder.PutUint32(size, uint32(len(c)))
+	byteOrder.PutUint32(size, uint32(len(c)))
 	output = append(output, size...)
 
 	for _, point := range c {
-		dataByte, err := point.MarshalEWBK(header)
+		dataByte, err := point.MarshalEWBK(byteOrder)
 		if err != nil {
 			return nil, err
 		}
@@ -124,16 +137,16 @@ func (c *CoordinateGroup) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 }
 
 // MarshalEWBK implements the Marshaler interface.
-func (c CoordinateGroup) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
+func (c CoordinateGroup) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
 	output := []byte{}
 
 	size := make([]byte, size32bit)
 
-	header.ByteOrder.PutUint32(size, uint32(len(c)))
+	byteOrder.PutUint32(size, uint32(len(c)))
 	output = append(output, size...)
 
 	for _, point := range c {
-		dataByte, err := point.MarshalEWBK(header)
+		dataByte, err := point.MarshalEWBK(byteOrder)
 		if err != nil {
 			return nil, err
 		}

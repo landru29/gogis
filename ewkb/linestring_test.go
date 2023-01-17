@@ -134,14 +134,7 @@ func TestLinestringMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := linestring.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(3)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypeLineString),
-			),
-		)
+		data, err := linestring.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,
@@ -166,14 +159,7 @@ func TestLinestringMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := linestring.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(2)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypeLineString),
-			),
-		)
+		data, err := linestring.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,
@@ -196,14 +182,7 @@ func TestLinestringMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := linestring.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(0)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypeLineString),
-			),
-		)
+		data, err := linestring.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,

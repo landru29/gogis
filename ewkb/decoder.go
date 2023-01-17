@@ -3,6 +3,7 @@ package ewkb
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/hex"
 	"io"
 	"math"
 )
@@ -30,7 +31,7 @@ type ExtendedWellKnownBytesHeader struct {
 // ExtendedWellKnownBytes is the EWKB.
 type ExtendedWellKnownBytes struct {
 	ExtendedWellKnownBytesHeader
-	DataStream *bytes.Buffer
+	DataStream io.Reader
 	IsNil      bool
 }
 
@@ -54,57 +55,20 @@ func (e ExtendedWellKnownBytes) ReadFloat64() (float64, error) {
 	return math.Float64frombits(bits), err
 }
 
-// Marshal converts ExtendedWellKnownBytes to EWKB array of bytes.
-func (e ExtendedWellKnownBytes) Marshal() []byte {
-	output := make([]byte, 1+size32bit)
-
-	output[0] = map[binary.ByteOrder]byte{
-		binary.BigEndian:    0,
-		binary.LittleEndian: 1,
-	}[e.ByteOrder]
-
-	withSRID := uint32(0)
-
-	if e.SRID != nil {
-		sridBytes := make([]byte, size32bit)
-
-		e.ByteOrder.PutUint32(sridBytes, uint32(*e.SRID))
-
-		output = append(output, sridBytes...) //nolint: makezero
-
-		withSRID = ewkbSRID
-	}
-
-	e.ByteOrder.PutUint32(output[1:], e.Layout.Uint32()+uint32(e.Type)+withSRID)
-
-	output = append(output, e.DataStream.Bytes()...) //nolint: makezero
-
-	return toHex(output)
-}
-
 // DecodeHeader decodes EWKB header.
-func DecodeHeader( /*data interface{}*/ reader io.Reader) (*ExtendedWellKnownBytes, error) {
-	if data == nil {
+func DecodeHeader(reader io.Reader) (*ExtendedWellKnownBytes, error) {
+	var firstByte = make([]byte, 1)
+	_, err := reader.Read(firstByte)
+	if err == io.EOF {
 		return &ExtendedWellKnownBytes{IsNil: true}, nil
 	}
-
-	if strData, ok := data.(string); ok {
-		return DecodeHeader([]byte(strData))
-	}
-
-	dataByte, ok := data.([]byte)
-	if !ok {
-		return nil, ErrIncompatibleFormat
-	}
-
-	decodedData, err := fromHex(dataByte)
 	if err != nil {
 		return nil, err
 	}
 
 	var byteOrder binary.ByteOrder
 
-	switch decodedData[0] {
+	switch firstByte[0] {
 	case bigEndian:
 		byteOrder = binary.BigEndian
 	case littleEndian:
@@ -113,7 +77,12 @@ func DecodeHeader( /*data interface{}*/ reader io.Reader) (*ExtendedWellKnownByt
 		return nil, ErrWrongByteOrder
 	}
 
-	header := byteOrder.Uint32(decodedData[1:5])
+	var controlByte = make([]byte, 4)
+	if _, err := reader.Read(controlByte); err != nil {
+		return nil, err
+	}
+
+	header := byteOrder.Uint32(controlByte)
 
 	output := ExtendedWellKnownBytes{
 		ExtendedWellKnownBytesHeader: ExtendedWellKnownBytesHeader{
@@ -121,7 +90,7 @@ func DecodeHeader( /*data interface{}*/ reader io.Reader) (*ExtendedWellKnownByt
 			Type:      GeometryType(header &^ (ewkbZ | ewkbM | ewkbSRID)),
 			ByteOrder: byteOrder,
 		},
-		DataStream: bytes.NewBuffer(decodedData[5:]),
+		DataStream: reader,
 	}
 
 	if header&ewkbSRID != 0 {
@@ -136,32 +105,39 @@ func DecodeHeader( /*data interface{}*/ reader io.Reader) (*ExtendedWellKnownByt
 	return &output, nil
 }
 
-// Marshal converts Geometry to EWKB array of bytes.
-func Marshal(geoShape Marshaler) ([]byte, error) {
-	header := geoShape.Header()
-
-	if header.ByteOrder == nil {
-		header.ByteOrder = binary.LittleEndian
-	}
-
-	data, err := geoShape.MarshalEWBK(header)
-	if err != nil {
-		return nil, err
-	}
-
-	return ExtendedWellKnownBytes{
-		ExtendedWellKnownBytesHeader: header,
-		DataStream:                   bytes.NewBuffer(data),
-	}.Marshal(), nil
-}
-
 // Unmarshal converts EWKB array of bytes to Geometry.
 func Unmarshal(geoShape Unmarshaler, value interface{}) error {
 	if value == nil {
 		return nil
 	}
 
-	record, err := DecodeHeader(value)
+	if strData, ok := value.(string); ok {
+		return Unmarshal(geoShape, []byte(strData))
+	}
+
+	dataByte, ok := value.([]byte)
+	if !ok {
+		return ErrIncompatibleFormat
+	}
+
+	return NewDecoder(bytes.NewBuffer(dataByte)).Decode(geoShape)
+}
+
+// Decoder is a Extended Well Known Byte decoder.
+type Decoder struct {
+	reader io.Reader
+}
+
+// NewDecoder creates a EWKB decoder.
+func NewDecoder(reader io.Reader) *Decoder {
+	return &Decoder{
+		reader: hex.NewDecoder(reader),
+	}
+}
+
+// Decode decodes to a Geometry.
+func (d *Decoder) Decode(geoShape Unmarshaler) error {
+	record, err := DecodeHeader(d.reader)
 	if err != nil {
 		return err
 	}

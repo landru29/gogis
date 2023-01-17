@@ -25,8 +25,8 @@ func (l *Linestring) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 }
 
 // MarshalEWBK implements the Marshaler interface.
-func (l Linestring) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
-	return l.CoordinateSet.MarshalEWBK(header)
+func (l Linestring) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
+	return l.CoordinateSet.MarshalEWBK(byteOrder)
 }
 
 // Header implements the Marshaler interface.
@@ -45,4 +45,20 @@ func (l Linestring) Header() ExtendedWellKnownBytesHeader {
 		ByteOrder: binary.LittleEndian,
 		SRID:      l.SRID,
 	}
+}
+
+// SystemReferenceID implements the Marshaler interface.
+func (l Linestring) SystemReferenceID() *SystemReferenceID {
+	return l.SRID
+}
+
+// Layout implements the Marshaler interface.
+func (l Linestring) Layout() Layout {
+	indexes := []byte{}
+
+	if len(l.CoordinateSet) > 0 {
+		return l.CoordinateSet[0].Layout()
+	}
+
+	return newLayoutFrom(indexes)
 }

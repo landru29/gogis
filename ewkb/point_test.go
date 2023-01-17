@@ -109,14 +109,7 @@ func TestPointMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := point.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(3)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypePoint),
-			),
-		)
+		data, err := point.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,
@@ -134,14 +127,7 @@ func TestPointMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := point.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(2)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypePoint),
-			),
-		)
+		data, err := point.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,
@@ -158,14 +144,7 @@ func TestPointMarshalEWBK(t *testing.T) {
 			},
 		}
 
-		data, err := point.MarshalEWBK(
-			newExtendedWellKnownBytesHeader(
-				withLayout(ewkb.Layout(0)),
-				withByteOrder(binary.LittleEndian),
-				withSRID(ewkb.SystemReferenceWGS84),
-				withType(ewkb.GeometryTypePoint),
-			),
-		)
+		data, err := point.MarshalEWBK(binary.LittleEndian)
 		assert.NoError(t, err)
 		assert.Equal(
 			t,
