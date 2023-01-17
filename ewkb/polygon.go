@@ -1,8 +1,10 @@
 package ewkb
 
+import "encoding/binary"
+
 type Polygon struct {
-	SRID  *SystemReferenceID
-	Rings []Linestring
+	SRID *SystemReferenceID
+	CoordinateGroup
 }
 
 // Type implements the Geometry interface.
@@ -16,56 +18,46 @@ func (p *Polygon) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 		return ErrWrongGeometryType
 	}
 
-	size, err := record.ReadUint32()
-	if err != nil {
-		return err
-	}
-
-	p.SRID = record.SRID
-
-	p.Rings = make([]Linestring, size)
-	for idx := range p.Rings {
-		record.Type = GeometryTypeLineString
-		err := (&(p.Rings[idx])).UnmarshalEWBK(record)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return (&(p.CoordinateGroup)).UnmarshalEWBK(record)
 }
 
 // MarshalEWBK implements the Marshaler interface.
-func (p Polygon) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
-	output := []byte{}
-
-	size := make([]byte, size32bit)
-
-	header.ByteOrder.PutUint32(size, uint32(len(p.Rings)))
-	output = append(output, size...)
-
-	for _, rings := range p.Rings {
-		dataByte, err := rings.MarshalEWBK(header)
-		if err != nil {
-			return nil, err
-		}
-
-		output = append(output, dataByte...)
-	}
-
-	return output, nil
+func (p Polygon) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
+	return p.CoordinateGroup.MarshalEWBK(byteOrder)
 }
 
 // Header implements the Marshaler interface.
 func (p Polygon) Header() ExtendedWellKnownBytesHeader {
-	var header ExtendedWellKnownBytesHeader
+	indexes := []byte{}
 
-	if len(p.Rings) > 0 {
-		header = p.Rings[0].Header()
+	if len(p.CoordinateGroup) > 0 && len(p.CoordinateGroup[0]) > 0 {
+		for idx1 := range p.CoordinateGroup[0][0] {
+			indexes = append(indexes, idx1)
+		}
 	}
 
-	header.SRID = p.SRID
-	header.Type = GeometryTypeLineString
+	return ExtendedWellKnownBytesHeader{
+		Type:      p.Type(),
+		Layout:    newLayoutFrom(indexes),
+		ByteOrder: binary.LittleEndian,
+		SRID:      p.SRID,
+	}
+}
 
-	return header
+// SystemReferenceID implements the Marshaler interface.
+func (p Polygon) SystemReferenceID() *SystemReferenceID {
+	return p.SRID
+}
+
+// Layout implements the Marshaler interface.
+func (p Polygon) Layout() Layout {
+	indexes := []byte{}
+
+	for idx0 := range p.CoordinateGroup {
+		for idx1 := range p.CoordinateGroup[idx0] {
+			return p.CoordinateGroup[idx0][idx1].Layout()
+		}
+	}
+
+	return newLayoutFrom(indexes)
 }

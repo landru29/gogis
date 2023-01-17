@@ -38,10 +38,10 @@ func (l *NullLinestring) Scan(value interface{}) error {
 		return err
 	}
 
-	pointSet := make([]Point, len(linestring.Points))
+	pointSet := make([]Point, len(linestring.CoordinateSet))
 
-	for idx, pnt := range linestring.Points {
-		pointSet[idx] = Point(pnt)
+	for idx, pnt := range linestring.CoordinateSet {
+		pointSet[idx].Coordinate = pnt
 	}
 
 	l.Linestring = Linestring(pointSet)
@@ -58,10 +58,10 @@ func (l *Linestring) Scan(value interface{}) error {
 		return err
 	}
 
-	pointSet := make([]Point, len(linestring.Points))
+	pointSet := make([]Point, len(linestring.CoordinateSet))
 
-	for idx, pnt := range linestring.Points {
-		pointSet[idx] = Point(pnt)
+	for idx, pnt := range linestring.CoordinateSet {
+		pointSet[idx].Coordinate = pnt
 	}
 
 	*l = Linestring(pointSet)
@@ -72,7 +72,7 @@ func (l *Linestring) Scan(value interface{}) error {
 // Value implements the driver.Valuer interface.
 func (l Linestring) Value() (driver.Value, error) {
 	linestring := ewkb.Linestring{
-		Points: make([]ewkb.Point, len(l)),
+		CoordinateSet: make(ewkb.CoordinateSet, len(l)),
 	}
 
 	if len(l) > 0 {
@@ -80,7 +80,7 @@ func (l Linestring) Value() (driver.Value, error) {
 	}
 
 	for idx, pnt := range l {
-		linestring.Points[idx] = ewkb.Point(pnt)
+		linestring.CoordinateSet[idx] = pnt.Coordinate
 	}
 
 	return ewkb.Marshal(linestring)

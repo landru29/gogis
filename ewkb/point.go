@@ -4,8 +4,8 @@ import "encoding/binary"
 
 // Point is a lat lng position in database.
 type Point struct {
-	SRID        *SystemReferenceID
-	Coordinates map[byte]float64
+	SRID *SystemReferenceID
+	Coordinate
 }
 
 // Type implements the Geometry interface.
@@ -19,40 +19,24 @@ func (p *Point) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 		return ErrWrongGeometryType
 	}
 
-	var pnt point
+	p.SRID = record.SRID
 
-	if err := (&pnt).read(record.DataStream, record.Layout.Size(), record.ByteOrder); err != nil {
+	if err := (&(p.Coordinate)).UnmarshalEWBK(record); err != nil {
 		return err
-	}
-
-	*p = Point{
-		SRID:        record.SRID,
-		Coordinates: map[byte]float64{},
-	}
-
-	for idx, char := range record.Layout.Format() {
-		p.Coordinates[byte(char)] = pnt[idx]
 	}
 
 	return nil
 }
 
 // MarshalEWBK implements the Marshaler interface.
-func (p Point) MarshalEWBK(header ExtendedWellKnownBytesHeader) ([]byte, error) {
-	output := []byte{}
-
-	for _, name := range header.Layout.Format() {
-		bytes := float64Bytes(p.Coordinates[byte(name)], header.ByteOrder)
-		output = append(output, bytes...)
-	}
-
-	return output, nil
+func (p Point) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
+	return p.Coordinate.MarshalEWBK(byteOrder)
 }
 
 // Header implements the Marshaler interface.
 func (p Point) Header() ExtendedWellKnownBytesHeader {
 	indexes := []byte{}
-	for idx := range p.Coordinates {
+	for idx := range p.Coordinate {
 		indexes = append(indexes, idx)
 	}
 
@@ -62,4 +46,14 @@ func (p Point) Header() ExtendedWellKnownBytesHeader {
 		ByteOrder: binary.LittleEndian,
 		SRID:      p.SRID,
 	}
+}
+
+// SystemReferenceID implements the Marshaler interface.
+func (p Point) SystemReferenceID() *SystemReferenceID {
+	return p.SRID
+}
+
+// Layout implements the Marshaler interface.
+func (p Point) Layout() Layout {
+	return p.Coordinate.Layout()
 }

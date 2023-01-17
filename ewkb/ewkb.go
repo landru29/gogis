@@ -32,6 +32,8 @@
 //     the dimension of the array. The points are read as below.
 package ewkb
 
+import "encoding/binary"
+
 // SystemReferenceID is the identifier of the system reference for projection.
 type SystemReferenceID uint32
 
@@ -55,13 +57,35 @@ type Unmarshaler interface {
 // Marshaler is the Geometry to byte array converter.
 type Marshaler interface {
 	// MarshalEWBK must only generate the data part of the EWKB (not the header part).
-	MarshalEWBK(ExtendedWellKnownBytesHeader) ([]byte, error)
+	MarshalEWBK(binary.ByteOrder) ([]byte, error)
 
 	// Header builds a header record (used to generate the first bytes of the EWKB).
 	Header() ExtendedWellKnownBytesHeader
+
+	// SystemReferenceID is the optional SRID.
+	SystemReferenceID() *SystemReferenceID
+
+	// Layout is the Layout used by the geometry.
+	Layout() Layout
+
+	// Type is the type of geometry.
+	Type() GeometryType
 }
 
 // WithSRID converts SystemReferenceID to pointer.
 func WithSRID(srid SystemReferenceID) *SystemReferenceID {
 	return &srid
+}
+
+// IsEWKB checks if data is pententially Extended Well Known Bytes.
+func IsEWKB(data interface{}) bool {
+	if strData, ok := data.(string); ok {
+		return IsEWKB([]byte(strData))
+	}
+
+	if byteData, ok := data.([]byte); ok {
+		return byteData[0] == 0 || byteData[0] == 1
+	}
+
+	return false
 }

@@ -52,7 +52,6 @@ const (
 
 // Geometry is a geometrical shape.
 type Geometry interface {
-	Type() GeometryType
 	Unmarshaler
 	Marshaler
 }
