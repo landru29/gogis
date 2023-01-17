@@ -1,6 +1,9 @@
 package gogis_test
 
 import (
+	"context"
+	"database/sql"
+	"log"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -196,5 +199,65 @@ func TestGeometryScan(t *testing.T) {
 			assert.Equal(t, fixture.expectedGeometryType, geometry.Type)
 			assert.Equal(t, fixture.expectedGeometry, geometry.Geometry)
 		})
+	}
+}
+
+func Example_scanAny() {
+	ctx := context.Background()
+	// CREATE TABLE IF NOT EXISTS geometries (
+	// 	coordinate GEOMETRY
+	// );
+
+	// Connect to database.
+	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Prepare the query.
+	rows, err := db.QueryContext(ctx, `
+		SELECT
+			coordinate
+		FROM geometries
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		_ = rows.Close()
+	}()
+
+	// Here you can inject your own type:
+	// geometry := gogis.NewFeometry(gogis.WithWellKnownGeometry(&myCustom1{}, &myCustom2{}))
+	geometry := gogis.NewGeometry()
+
+	// Read data.
+	if rows.Next() {
+		err = rows.Scan(&geometry)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	switch geometry.Geometry.(type) {
+	case *ewkb.Point:
+		// process point
+	case *ewkb.Linestring:
+		// process linestring
+	case *ewkb.Polygon:
+		// process polygon
+	case *ewkb.MultiPoint:
+		// process multipoint
+	default:
+		// If you have your custom types, just add:
+		// case *myCustom1:
+		// process myCustom1
+		// case *myCustom2:
+		// process myCustom2
 	}
 }
