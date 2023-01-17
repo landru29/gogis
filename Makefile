@@ -6,7 +6,7 @@ endif
 .PHONY: lint test lint-fix
 
 test:
-	$(GOTEST) ./...
+	$(GOTEST) -coverprofile coverage.out ./... && go tool cover -func=coverage.out
 
 lint:
 	golangci-lint run --timeout 10m0s --allow-parallel-runners $(param) ./...

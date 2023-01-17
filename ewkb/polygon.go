@@ -18,6 +18,8 @@ func (p *Polygon) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 		return ErrWrongGeometryType
 	}
 
+	p.SRID = record.SRID
+
 	return (&(p.CoordinateGroup)).UnmarshalEWBK(record)
 }
 

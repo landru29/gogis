@@ -258,7 +258,6 @@ func TestPointMarshal(t *testing.T) {
 		geometry    ewkb.Geometry
 		strGeometry string
 		expected    string
-		srid        *ewkb.SystemReferenceID
 	}{
 		{
 			strGeometry: "POINT ZM(-71.060316 48.432044 10 30)",

@@ -338,7 +338,6 @@ func TestLinestringMarshal(t *testing.T) {
 		geometry    ewkb.Geometry
 		strGeometry string
 		expected    string
-		srid        *ewkb.SystemReferenceID
 	}{
 		{
 			strGeometry: "LINESTRING ZM(-71.060316 48.432044 10 30, 5 6 7 8)",
