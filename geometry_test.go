@@ -13,14 +13,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const dbQueryString = "SELECT coordinate FROM geometry"
-
 func TestGeometryScan(t *testing.T) {
 	fixtures := []struct {
 		title                string
 		rawData              []byte
 		expectedGeometryType ewkb.GeometryType
 		expectedGeometry     ewkb.Geometry
+		//scanner              sql.Scanner
 	}{
 		{
 			title:                "point",
