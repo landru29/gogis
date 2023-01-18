@@ -3,7 +3,7 @@ package gogis_test
 import (
 	"context"
 	"database/sql"
-	"log"
+	"fmt"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -202,16 +202,36 @@ func TestGeometryScan(t *testing.T) {
 	}
 }
 
+// This example shows how to read any geometry from database.
 func Example_scanAny() {
+	// Launch database:
+	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
+	//
+	// Create the table:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "CREATE TABLE IF NOT EXISTS geometries (coordinate GEOMETRY);" -t
+	//
+	// Insert data:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "INSERT INTO geometries(coordinate) VALUES (ST_GeomFromText('POINT ZM(10 20 30 50)', 4326))" -t
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "INSERT INTO geometries(coordinate) VALUES (ST_GeomFromText('MULTIPOINT((-71.42 42.71),(-17.42 42.17),(-17.42 71.17),(-71.42 42.71))', 4326))" -t
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "INSERT INTO geometries(coordinate) VALUES (ST_GeomFromText('POLYGON Z((-71.42 42.71 4,-17.42 42.17 4,-17.42 71.17 4,-71.42 42.71 4),(1 2 3,4 5 6,7 8 9,1 2 3))', 4326))" -t
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "INSERT INTO geometries(coordinate) VALUES (ST_GeomFromText('LINESTRING (-71.060316 48.432044, 5 6, 42 24)', 4326))" -t
+	//
+	// Do not forget the imports:
+	// import (
+	// 	"context"
+	// 	"database/sql"
+
+	// 	_ "github.com/lib/pq"
+
+	// 	"github.com/landru29/gogis"
+	// 	"github.com/landru29/gogis/ewkb"
+	// )
 	ctx := context.Background()
-	// CREATE TABLE IF NOT EXISTS geometries (
-	// 	coordinate GEOMETRY
-	// );
 
 	// Connect to database.
 	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Prepare the query.
@@ -221,43 +241,51 @@ func Example_scanAny() {
 		FROM geometries
 	`)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	defer func() {
 		_ = rows.Close()
 	}()
 
-	// Here you can inject your own type:
-	// geometry := gogis.NewFeometry(gogis.WithWellKnownGeometry(&myCustom1{}, &myCustom2{}))
-	geometry := gogis.NewGeometry()
-
 	// Read data.
-	if rows.Next() {
-		err = rows.Scan(&geometry)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	for rows.Next() {
+		// Here you can inject your own type:
+		// geometry := gogis.NewFeometry(gogis.WithWellKnownGeometry(&myCustom1{}, &myCustom2{}))
+		geometry := gogis.NewGeometry()
 
-	switch geometry.Geometry.(type) {
-	case *ewkb.Point:
-		// process point
-	case *ewkb.Linestring:
-		// process linestring
-	case *ewkb.Polygon:
-		// process polygon
-	case *ewkb.MultiPoint:
-		// process multipoint
-	default:
-		// If you have your custom types, just add:
-		// case *myCustom1:
-		// process myCustom1
-		// case *myCustom2:
-		// process myCustom2
+		err = rows.Scan(geometry)
+		if err != nil {
+			panic(err)
+		}
+
+		switch data := geometry.Geometry.(type) {
+		case *ewkb.Point:
+			// process point
+			fmt.Printf("* point %+v\n", data)
+
+		case *ewkb.Linestring:
+			// process linestring
+			fmt.Printf("* linestring %+v\n", data)
+
+		case *ewkb.Polygon:
+			// process polygon
+			fmt.Printf("* polygon %+v\n", data)
+
+		case *ewkb.MultiPoint:
+			// process multipoint
+			fmt.Printf("* multipoint %+v\n", data)
+
+		default:
+			// If you have your custom types, just add:
+			// case *myCustom1:
+			// process myCustom1
+			// case *myCustom2:
+			// process myCustom2
+		}
 	}
 }

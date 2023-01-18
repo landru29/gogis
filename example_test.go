@@ -4,22 +4,37 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 
 	"github.com/landru29/gogis"
 	"github.com/landru29/gogis/ewkb"
 )
 
 func Example_scanPoint() {
+	// Launch database:
+	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
+	//
+	// Create the table:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "CREATE TABLE IF NOT EXISTS geometries (coordinate GEOMETRY);" -t
+	//
+	// Insert data:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "INSERT INTO geometries(coordinate) VALUES (ST_GeomFromText('POINT ZM(10 20 30 50)', 4326))" -t
+	//
+	// Do not forget the imports:
+	// import (
+	// 	"context"
+	// 	"database/sql"
+
+	// 	_ "github.com/lib/pq"
+
+	// 	"github.com/landru29/gogis"
+	// 	"github.com/landru29/gogis/ewkb"
+	// )
 	ctx := context.Background()
-	// CREATE TABLE IF NOT EXISTS geometries (
-	// 	coordinate GEOMETRY
-	// );
 
 	// Connect to database.
 	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Prepare the query.
@@ -29,11 +44,11 @@ func Example_scanPoint() {
 		FROM geometries
 	`)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	defer func() {
@@ -48,7 +63,7 @@ func Example_scanPoint() {
 
 		err = rows.Scan(&pnt)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 
 		if pnt.Valid {
@@ -61,15 +76,31 @@ func Example_scanPoint() {
 }
 
 func Example_scanLinestring() {
+	// Launch database:
+	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
+	//
+	// Create the table:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "CREATE TABLE IF NOT EXISTS geometries (coordinate GEOMETRY);" -t
+	//
+	// Insert data:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "INSERT INTO geometries(coordinate) VALUES (ST_GeomFromText('LINESTRING (-71.060316 48.432044, 5 6, 42 24)', 4326))" -t
+	//
+	// Do not forget the imports:
+	// import (
+	// 	"context"
+	// 	"database/sql"
+
+	// 	_ "github.com/lib/pq"
+
+	// 	"github.com/landru29/gogis"
+	// 	"github.com/landru29/gogis/ewkb"
+	// )
 	ctx := context.Background()
-	// CREATE TABLE IF NOT EXISTS geometries (
-	// 	coordinate GEOMETRY
-	// );
 
 	// Connect to database.
 	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Prepare the query.
@@ -79,11 +110,11 @@ func Example_scanLinestring() {
 		FROM geometries
 	`)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	if err := rows.Err(); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	defer func() {
@@ -98,7 +129,7 @@ func Example_scanLinestring() {
 
 		err = rows.Scan(&pnt)
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 
 		if pnt.Valid {
@@ -111,15 +142,28 @@ func Example_scanLinestring() {
 }
 
 func Example_insertPoint() {
+	// Launch database:
+	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
+	//
+	// Create the table:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "CREATE TABLE IF NOT EXISTS geometries (coordinate GEOMETRY);" -t
+	//
+	// Do not forget the imports:
+	// import (
+	// 	"context"
+	// 	"database/sql"
+
+	// 	_ "github.com/lib/pq"
+
+	// 	"github.com/landru29/gogis"
+	// 	"github.com/landru29/gogis/ewkb"
+	// )
 	ctx := context.Background()
-	// CREATE TABLE IF NOT EXISTS geometries (
-	// 	coordinate GEOMETRY
-	// );
 
 	// Connect to database.
 	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Prepare the query.
@@ -131,7 +175,7 @@ func Example_insertPoint() {
 		)
 	`)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	defer func() {
@@ -148,20 +192,33 @@ func Example_insertPoint() {
 			SRID: ewkb.WithSRID(ewkb.SystemReferenceWGS84),
 		},
 	); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
 
 func Example_insertLinestring() {
+	// Launch database:
+	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
+	//
+	// Create the table:
+	// $> docker exec -i db psql -h 0.0.0.0 -p 5432 -U tester -d test -c "CREATE TABLE IF NOT EXISTS geometries (coordinate GEOMETRY);" -t
+	//
+	// Do not forget the imports:
+	// import (
+	// 	"context"
+	// 	"database/sql"
+
+	// 	_ "github.com/lib/pq"
+
+	// 	"github.com/landru29/gogis"
+	// 	"github.com/landru29/gogis/ewkb"
+	// )
 	ctx := context.Background()
-	// CREATE TABLE IF NOT EXISTS geometries (
-	// 	coordinate GEOMETRY
-	// );
 
 	// Connect to database.
 	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	// Prepare the query.
@@ -173,7 +230,7 @@ func Example_insertLinestring() {
 		)
 	`)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	defer func() {
@@ -199,6 +256,6 @@ func Example_insertLinestring() {
 			},
 		},
 	); err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 }
