@@ -6,6 +6,8 @@ import (
 )
 
 // Point is a POINT in database.
+//
+// A Point is a 0-dimensional geometry that represents a single location in coordinate space.
 type Point struct {
 	SRID *SystemReferenceID
 	Coordinate

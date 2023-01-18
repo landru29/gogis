@@ -7,6 +7,9 @@ import (
 )
 
 // MultiPolygon is a MULTILINESTRING in database.
+//
+// A MultiPolygon is a collection of non-overlapping, non-adjacent Polygons.
+// Polygons in the collection may touch only at a finite number of points.
 type MultiPolygon struct {
 	SRID     *SystemReferenceID
 	Polygons []Polygon

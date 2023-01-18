@@ -7,6 +7,8 @@ import (
 )
 
 // Multipoint is a MULTIPOINT in database.
+//
+// A MultiPoint is a collection of Points.
 type MultiPoint struct {
 	SRID   *SystemReferenceID
 	Points []Point

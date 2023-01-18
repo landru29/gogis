@@ -5,6 +5,11 @@ import (
 	"fmt"
 )
 
+// Polygon is a POLYGON in database.
+//
+// A Polygon is a 2-dimensional planar region, delimited by an exterior
+// boundary (the shell) and zero or more interior boundaries (holes).
+// Each boundary is a LinearRing
 type Polygon struct {
 	SRID *SystemReferenceID
 	CoordinateGroup
