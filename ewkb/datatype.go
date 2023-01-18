@@ -12,7 +12,7 @@ func (p *point) read(dataStream io.Reader, size uint32, byteOrder binary.ByteOrd
 
 	for idx := 0; idx < int(size); idx++ {
 		floatBytes := make([]byte, size64bit)
-		if _, err := dataStream.Read(floatBytes); err != nil {
+		if _, err := io.ReadFull(dataStream, floatBytes); err != nil {
 			return err
 		}
 

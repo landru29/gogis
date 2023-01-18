@@ -32,8 +32,6 @@ func (p *MultiPoint) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 	p.Points = make([]Point, size)
 
 	for idx := range p.Points {
-		record.Type = GeometryTypePoint
-
 		pnt := &Point{}
 		if err := (&Decoder{reader: record.DataStream}).Decode(pnt); err != nil {
 			return err
