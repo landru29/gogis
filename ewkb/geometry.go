@@ -43,11 +43,11 @@ const (
 	// GeometryTypePolyhedralSurface stands for polyhedralSurface.
 	GeometryTypePolyhedralSurface GeometryType = 13
 
-	// GeometryTypeTriangle stands for triangle.
-	GeometryTypeTriangle GeometryType = 14
-
 	// GeometryTypeTin stands for tin.
 	GeometryTypeTin GeometryType = 15
+
+	// GeometryTypeTriangle stands for triangle.
+	GeometryTypeTriangle GeometryType = 17
 )
 
 // Geometry is a geometrical shape.

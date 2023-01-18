@@ -3,6 +3,7 @@ package ewkb
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 )
 
 // MultiPolygon is a MULTILINESTRING in database.
@@ -19,7 +20,7 @@ func (m MultiPolygon) Type() GeometryType {
 // UnmarshalEWBK implements the Unmarshaler interface.
 func (m *MultiPolygon) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 	if record.Type != m.Type() {
-		return ErrWrongGeometryType
+		return fmt.Errorf("%w: found %d, expected %d", ErrWrongGeometryType, record.Type, m.Type())
 	}
 
 	m.SRID = record.SRID

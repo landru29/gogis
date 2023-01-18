@@ -1,6 +1,9 @@
 package ewkb
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 type Polygon struct {
 	SRID *SystemReferenceID
@@ -15,7 +18,7 @@ func (p Polygon) Type() GeometryType {
 // UnmarshalEWBK implements the Unmarshaler interface.
 func (p *Polygon) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 	if record.Type != p.Type() {
-		return ErrWrongGeometryType
+		return fmt.Errorf("%w: found %d, expected %d", ErrWrongGeometryType, record.Type, p.Type())
 	}
 
 	p.SRID = record.SRID

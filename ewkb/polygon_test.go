@@ -145,7 +145,7 @@ func TestPolygonUnmarshalEWBK(t *testing.T) {
 			),
 		)
 		require.Error(t, err)
-		assert.ErrorIs(t, ewkb.ErrWrongGeometryType, err)
+		assert.ErrorIs(t, err, ewkb.ErrWrongGeometryType)
 	})
 }
 

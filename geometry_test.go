@@ -296,6 +296,39 @@ func TestGeometryScan(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:                "triangle",
+			rawData:              []byte("01110000C001000000040000007B14AE47E1DA51C07B14AE47E15A454000000000000010400000000000001440EC51B81E856B31C0F6285C8FC215454000000000000010400000000000001440EC51B81E856B31C07B14AE47E1CA5140000000000000104000000000000014407B14AE47E1DA51C07B14AE47E15A454000000000000010400000000000001440"),
+			expectedGeometryType: ewkb.GeometryTypeTriangle,
+			expectedGeometry: &ewkb.Triangle{
+				CoordinateSet: ewkb.CoordinateSet{
+					{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
+						'm': 5,
+					},
+					{
+						'x': -17.42,
+						'y': 42.17,
+						'z': 4,
+						'm': 5,
+					},
+					{
+						'x': -17.42,
+						'y': 71.17,
+						'z': 4,
+						'm': 5,
+					},
+					{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
+						'm': 5,
+					},
+				},
+			},
+		},
 	}
 
 	for idx := range fixtures {
