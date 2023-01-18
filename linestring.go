@@ -6,33 +6,33 @@ import (
 	"github.com/landru29/gogis/ewkb"
 )
 
-// Linestring is LINESTRING in database.
-type Linestring []Point
+// LineString is LINESTRING in database.
+type LineString []Point
 
-// NullLinestring represents a Linestring that may be null.
-// NullLinestring implements the SQL driver.Scanner interface so it
+// NullLineString represents a LineString that may be null.
+// NullLineString implements the SQL driver.Scanner interface so it
 // can be used as a scan destination:
 //
-//	var line gogis.NullLinestring
+//	var line gogis.NullLineString
 //	err := db.QueryRow("SELECT coordinate FROM foo WHERE id=?", id).Scan(&line)
 //	...
 //	if line.Valid {
-//	   // use line.Linestring
+//	   // use line.LineString
 //	} else {
 //	   // NULL value
 //	}
-type NullLinestring struct {
-	Linestring Linestring
+type NullLineString struct {
+	LineString LineString
 	Valid      bool
 }
 
 // Scan implements the SQL driver.Scanner interface.
-func (l *NullLinestring) Scan(value interface{}) error {
+func (l *NullLineString) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}
 
-	linestring := ewkb.Linestring{}
+	linestring := ewkb.LineString{}
 
 	if err := ewkb.Unmarshal(&linestring, value); err != nil {
 		return err
@@ -44,15 +44,15 @@ func (l *NullLinestring) Scan(value interface{}) error {
 		pointSet[idx].Coordinate = pnt
 	}
 
-	l.Linestring = Linestring(pointSet)
+	l.LineString = LineString(pointSet)
 	l.Valid = true
 
 	return nil
 }
 
 // Scan implements the SQL driver.Scanner interface.
-func (l *Linestring) Scan(value interface{}) error {
-	linestring := ewkb.Linestring{}
+func (l *LineString) Scan(value interface{}) error {
+	linestring := ewkb.LineString{}
 
 	if err := ewkb.Unmarshal(&linestring, value); err != nil {
 		return err
@@ -64,14 +64,14 @@ func (l *Linestring) Scan(value interface{}) error {
 		pointSet[idx].Coordinate = pnt
 	}
 
-	*l = Linestring(pointSet)
+	*l = LineString(pointSet)
 
 	return nil
 }
 
 // Value implements the driver.Valuer interface.
-func (l Linestring) Value() (driver.Value, error) {
-	linestring := ewkb.Linestring{
+func (l LineString) Value() (driver.Value, error) {
+	linestring := ewkb.LineString{
 		CoordinateSet: make(ewkb.CoordinateSet, len(l)),
 	}
 
@@ -87,10 +87,10 @@ func (l Linestring) Value() (driver.Value, error) {
 }
 
 // Value implements the driver.Valuer interface.
-func (l NullLinestring) Value() (driver.Value, error) {
+func (l NullLineString) Value() (driver.Value, error) {
 	if !l.Valid {
 		return nil, nil
 	}
 
-	return l.Linestring.Value()
+	return l.LineString.Value()
 }

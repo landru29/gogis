@@ -72,7 +72,7 @@ func main() {
 			// process point
 			fmt.Printf("* point %+v\n", data)
 
-		case *ewkb.Linestring:
+		case *ewkb.LineString:
 			// process linestring
 			fmt.Printf("* linestring %+v\n", data)
 

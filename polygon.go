@@ -7,7 +7,7 @@ import (
 )
 
 // Polygon is POLYGON in database.
-type Polygon []Linestring
+type Polygon []LineString
 
 // NullPolygon represents a Polygon that may be null.
 // NullPolygon implements the SQL driver.Scanner interface so it
@@ -38,14 +38,14 @@ func (l *NullPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	ringSet := make([]Linestring, len(polygon.CoordinateGroup))
+	ringSet := make([]LineString, len(polygon.CoordinateGroup))
 
 	for idx0, ring := range polygon.CoordinateGroup {
 		pointSet := make([]Point, len(ring))
 		for idx1, pnt := range ring {
 			pointSet[idx1].Coordinate = pnt
 		}
-		ringSet[idx0] = Linestring(pointSet)
+		ringSet[idx0] = LineString(pointSet)
 	}
 
 	l.Polygon = Polygon(ringSet)
@@ -62,14 +62,14 @@ func (l *Polygon) Scan(value interface{}) error {
 		return err
 	}
 
-	ringSet := make([]Linestring, len(polygon.CoordinateGroup))
+	ringSet := make([]LineString, len(polygon.CoordinateGroup))
 
 	for idx0, ring := range polygon.CoordinateGroup {
 		pointSet := make([]Point, len(ring))
 		for idx1, pnt := range ring {
 			pointSet[idx1].Coordinate = pnt
 		}
-		ringSet[idx0] = Linestring(pointSet)
+		ringSet[idx0] = LineString(pointSet)
 	}
 
 	*l = Polygon(ringSet)
