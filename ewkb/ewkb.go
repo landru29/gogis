@@ -28,7 +28,7 @@
 //
 //   - Point: depending on the the format (XY, XYM or XYZM), there are 2, 3 or 4 float64
 //     (8 bytes).
-//   - Linestring: It's an array of Point. First of all, there is a uint32 (4 bytes) for
+//   - LineString: It's an array of Point. First of all, there is a uint32 (4 bytes) for
 //     the dimension of the array. The points are read as below.
 package ewkb
 

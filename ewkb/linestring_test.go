@@ -12,13 +12,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestLinestringType(t *testing.T) {
-	assert.Equal(t, ewkb.GeometryTypeLineString, ewkb.Linestring{}.Type())
+func TestLineStringType(t *testing.T) {
+	assert.Equal(t, ewkb.GeometryTypeLineString, ewkb.LineString{}.Type())
 }
 
-func TestLinestringUnmarshalEWBK(t *testing.T) {
+func TestLineStringUnmarshalEWBK(t *testing.T) {
 	t.Run("XYZM", func(t *testing.T) {
-		var linestring ewkb.Linestring
+		var linestring ewkb.LineString
 
 		err := (&linestring).UnmarshalEWBK(
 			newExtendedWellKnownBytes(
@@ -47,7 +47,7 @@ func TestLinestringUnmarshalEWBK(t *testing.T) {
 	})
 
 	t.Run("XYZ", func(t *testing.T) {
-		var linestring ewkb.Linestring
+		var linestring ewkb.LineString
 
 		err := (&linestring).UnmarshalEWBK(
 			newExtendedWellKnownBytes(
@@ -74,7 +74,7 @@ func TestLinestringUnmarshalEWBK(t *testing.T) {
 	})
 
 	t.Run("XY", func(t *testing.T) {
-		var linestring ewkb.Linestring
+		var linestring ewkb.LineString
 
 		err := (&linestring).UnmarshalEWBK(
 			newExtendedWellKnownBytes(
@@ -98,7 +98,7 @@ func TestLinestringUnmarshalEWBK(t *testing.T) {
 		})
 	})
 	t.Run("wrong type", func(t *testing.T) {
-		var linestring ewkb.Linestring
+		var linestring ewkb.LineString
 
 		err := (&linestring).UnmarshalEWBK(
 			newExtendedWellKnownBytes(
@@ -115,9 +115,9 @@ func TestLinestringUnmarshalEWBK(t *testing.T) {
 	})
 }
 
-func TestLinestringMarshalEWBK(t *testing.T) {
+func TestLineStringMarshalEWBK(t *testing.T) {
 	t.Run("XYZM", func(t *testing.T) {
-		linestring := ewkb.Linestring{
+		linestring := ewkb.LineString{
 			CoordinateSet: []ewkb.Coordinate{
 				{
 					'x': -71.060316,
@@ -144,7 +144,7 @@ func TestLinestringMarshalEWBK(t *testing.T) {
 	})
 
 	t.Run("XYZ", func(t *testing.T) {
-		linestring := ewkb.Linestring{
+		linestring := ewkb.LineString{
 			CoordinateSet: []ewkb.Coordinate{
 				{
 					'x': -71.060316,
@@ -169,7 +169,7 @@ func TestLinestringMarshalEWBK(t *testing.T) {
 	})
 
 	t.Run("XY", func(t *testing.T) {
-		linestring := ewkb.Linestring{
+		linestring := ewkb.LineString{
 			CoordinateSet: []ewkb.Coordinate{
 				{
 					'x': -71.060316,
@@ -192,7 +192,7 @@ func TestLinestringMarshalEWBK(t *testing.T) {
 	})
 }
 
-func TestLinestringUnmarshal(t *testing.T) {
+func TestLineStringUnmarshal(t *testing.T) {
 	srid := ewkb.SystemReferenceWGS84
 
 	fixtures := []struct {
@@ -202,10 +202,10 @@ func TestLinestringUnmarshal(t *testing.T) {
 		expected    ewkb.Geometry
 	}{
 		{
-			geometry:    &ewkb.Linestring{},
+			geometry:    &ewkb.LineString{},
 			strGeometry: "LINESTRING ZM(-71.060316 48.432044 10 30, 5 6 7 8)",
 			binary:      "01020000C0020000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040",
-			expected: &ewkb.Linestring{
+			expected: &ewkb.LineString{
 				CoordinateSet: []ewkb.Coordinate{
 					{
 						'x': -71.060316,
@@ -223,10 +223,10 @@ func TestLinestringUnmarshal(t *testing.T) {
 			},
 		},
 		{
-			geometry:    &ewkb.Linestring{},
+			geometry:    &ewkb.LineString{},
 			strGeometry: "LINESTRING ZM(-71.060316 48.432044 10 30, 5 6 7 8), 4326",
 			binary:      "01020000E0E6100000020000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040",
-			expected: &ewkb.Linestring{
+			expected: &ewkb.LineString{
 				SRID: &srid,
 				CoordinateSet: []ewkb.Coordinate{
 					{
@@ -245,10 +245,10 @@ func TestLinestringUnmarshal(t *testing.T) {
 			},
 		},
 		{
-			geometry:    &ewkb.Linestring{},
+			geometry:    &ewkb.LineString{},
 			strGeometry: "LINESTRING Z(-71.060316 48.432044 10, 5 6 7)",
 			binary:      "0102000080020000003CDBA337DCC351C06D37C1374D3748400000000000002440000000000000144000000000000018400000000000001C40",
-			expected: &ewkb.Linestring{
+			expected: &ewkb.LineString{
 				CoordinateSet: []ewkb.Coordinate{
 					{
 						'x': -71.060316,
@@ -264,10 +264,10 @@ func TestLinestringUnmarshal(t *testing.T) {
 			},
 		},
 		{
-			geometry:    &ewkb.Linestring{},
+			geometry:    &ewkb.LineString{},
 			strGeometry: "LINESTRING Z(-71.060316 48.432044 10, 5 6 7), 4326",
 			binary:      "01020000A0E6100000020000003CDBA337DCC351C06D37C1374D3748400000000000002440000000000000144000000000000018400000000000001C40",
-			expected: &ewkb.Linestring{
+			expected: &ewkb.LineString{
 				SRID: &srid,
 				CoordinateSet: []ewkb.Coordinate{
 					{
@@ -284,10 +284,10 @@ func TestLinestringUnmarshal(t *testing.T) {
 			},
 		},
 		{
-			geometry:    &ewkb.Linestring{},
+			geometry:    &ewkb.LineString{},
 			strGeometry: "LINESTRING (-71.060316 48.432044, 5 6)",
 			binary:      "0102000000020000003CDBA337DCC351C06D37C1374D37484000000000000014400000000000001840",
-			expected: &ewkb.Linestring{
+			expected: &ewkb.LineString{
 				CoordinateSet: []ewkb.Coordinate{
 					{
 						'x': -71.060316,
@@ -301,10 +301,10 @@ func TestLinestringUnmarshal(t *testing.T) {
 			},
 		},
 		{
-			geometry:    &ewkb.Linestring{},
+			geometry:    &ewkb.LineString{},
 			strGeometry: "LINESTRING (-71.060316 48.432044, 5 6), 4326",
 			binary:      "0102000020E6100000020000003CDBA337DCC351C06D37C1374D37484000000000000014400000000000001840",
-			expected: &ewkb.Linestring{
+			expected: &ewkb.LineString{
 				SRID: &srid,
 				CoordinateSet: []ewkb.Coordinate{
 					{
@@ -331,7 +331,7 @@ func TestLinestringUnmarshal(t *testing.T) {
 	}
 }
 
-func TestLinestringMarshal(t *testing.T) {
+func TestLineStringMarshal(t *testing.T) {
 	srid := ewkb.SystemReferenceWGS84
 
 	fixtures := []struct {
@@ -342,7 +342,7 @@ func TestLinestringMarshal(t *testing.T) {
 		{
 			strGeometry: "LINESTRING ZM(-71.060316 48.432044 10 30, 5 6 7 8)",
 			expected:    "01020000C0020000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040",
-			geometry: &ewkb.Linestring{
+			geometry: &ewkb.LineString{
 				CoordinateSet: []ewkb.Coordinate{
 					{
 						'x': -71.060316,
@@ -362,7 +362,7 @@ func TestLinestringMarshal(t *testing.T) {
 		{
 			strGeometry: "LINESTRING ZM(-71.060316 48.432044 10 30, 5 6 7 8), 4326",
 			expected:    "01020000E0E6100000020000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040",
-			geometry: &ewkb.Linestring{
+			geometry: &ewkb.LineString{
 				SRID: &srid,
 				CoordinateSet: []ewkb.Coordinate{
 					{
@@ -383,7 +383,7 @@ func TestLinestringMarshal(t *testing.T) {
 		{
 			strGeometry: "LINESTRING Z(-71.060316 48.432044 10, 5 6 7)",
 			expected:    "0102000080020000003CDBA337DCC351C06D37C1374D3748400000000000002440000000000000144000000000000018400000000000001C40",
-			geometry: &ewkb.Linestring{
+			geometry: &ewkb.LineString{
 				CoordinateSet: []ewkb.Coordinate{
 					{
 						'x': -71.060316,
@@ -401,7 +401,7 @@ func TestLinestringMarshal(t *testing.T) {
 		{
 			strGeometry: "LINESTRING Z(-71.060316 48.432044 10, 5 6 7), 4326",
 			expected:    "01020000A0E6100000020000003CDBA337DCC351C06D37C1374D3748400000000000002440000000000000144000000000000018400000000000001C40",
-			geometry: &ewkb.Linestring{
+			geometry: &ewkb.LineString{
 				SRID: &srid,
 				CoordinateSet: []ewkb.Coordinate{
 					{
@@ -420,7 +420,7 @@ func TestLinestringMarshal(t *testing.T) {
 		{
 			strGeometry: "LINESTRING (-71.060316 48.432044, 5 6)",
 			expected:    "0102000000020000003CDBA337DCC351C06D37C1374D37484000000000000014400000000000001840",
-			geometry: &ewkb.Linestring{
+			geometry: &ewkb.LineString{
 				CoordinateSet: []ewkb.Coordinate{
 					{
 						'x': -71.060316,
@@ -436,7 +436,7 @@ func TestLinestringMarshal(t *testing.T) {
 		{
 			strGeometry: "LINESTRING (-71.060316 48.432044, 5 6), 4326",
 			expected:    "0102000020E6100000020000003CDBA337DCC351C06D37C1374D37484000000000000014400000000000001840",
-			geometry: &ewkb.Linestring{
+			geometry: &ewkb.LineString{
 				SRID: &srid,
 				CoordinateSet: []ewkb.Coordinate{
 					{

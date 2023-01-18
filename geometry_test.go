@@ -39,7 +39,7 @@ func TestGeometryScan(t *testing.T) {
 			title:                "linestring",
 			rawData:              []byte("01020000C0020000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040"),
 			expectedGeometryType: ewkb.GeometryTypeLineString,
-			expectedGeometry: &ewkb.Linestring{
+			expectedGeometry: &ewkb.LineString{
 				CoordinateSet: ewkb.CoordinateSet{
 					{
 						'x': -71.060316,
@@ -60,7 +60,7 @@ func TestGeometryScan(t *testing.T) {
 			title:                "linestring empty",
 			rawData:              []byte("010200000000000000"),
 			expectedGeometryType: ewkb.GeometryTypeLineString,
-			expectedGeometry: &ewkb.Linestring{
+			expectedGeometry: &ewkb.LineString{
 				CoordinateSet: ewkb.CoordinateSet{},
 			},
 		},
@@ -161,6 +161,47 @@ func TestGeometryScan(t *testing.T) {
 							'y': 42.71,
 							'z': 4,
 							'm': 5,
+						},
+					},
+				},
+			},
+		},
+		{
+			title:                "multilinestring",
+			rawData:              []byte("01050000C00200000001020000C002000000F6285C8FC23545403D0AD7A3703D38C01F85EB51B81E4540EC51B81E856B38C0000000000000144000000000000018400000000000001C40000000000000204001020000C0020000003D0AD7A370CD6140A4703D0AD7837AC048E17A14AEC761407B14AE47E11A5FC00000000000002E40000000000000304000000000000031400000000000003240"),
+			expectedGeometryType: ewkb.GeometryTypeMultiLineString,
+			expectedGeometry: &ewkb.MultiLineString{
+				LineStrings: []ewkb.LineString{
+					{
+						CoordinateSet: []ewkb.Coordinate{
+							{
+								'x': 42.42,
+								'y': -24.24,
+								'z': 42.24,
+								'm': -24.42,
+							},
+							{
+								'x': 5,
+								'y': 6,
+								'z': 7,
+								'm': 8,
+							},
+						},
+					},
+					{
+						CoordinateSet: []ewkb.Coordinate{
+							{
+								'x': 142.42,
+								'y': -424.24,
+								'z': 142.24,
+								'm': -124.42,
+							},
+							{
+								'x': 15,
+								'y': 16,
+								'z': 17,
+								'm': 18,
+							},
 						},
 					},
 				},
@@ -268,7 +309,7 @@ func Example_scanAny() {
 			// process point
 			fmt.Printf("* point %+v\n", data)
 
-		case *ewkb.Linestring:
+		case *ewkb.LineString:
 			// process linestring
 			fmt.Printf("* linestring %+v\n", data)
 

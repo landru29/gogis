@@ -266,7 +266,7 @@ func TestMultiPointMarshalEWBK(t *testing.T) {
 		)
 	})
 
-	t.Run("XYZ", func(t *testing.T) {
+	t.Run("XY", func(t *testing.T) {
 		point := ewkb.MultiPoint{
 			Points: []ewkb.Point{
 				{

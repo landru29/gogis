@@ -75,7 +75,7 @@ func Example_scanPoint() {
 	fmt.Println(output)
 }
 
-func Example_scanLinestring() {
+func Example_scanLineString() {
 	// Launch database:
 	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
 	//
@@ -121,11 +121,11 @@ func Example_scanLinestring() {
 		_ = rows.Close()
 	}()
 
-	output := []gogis.Linestring{}
+	output := []gogis.LineString{}
 
 	// Read data.
 	for rows.Next() {
-		pnt := gogis.NullLinestring{}
+		pnt := gogis.NullLineString{}
 
 		err = rows.Scan(&pnt)
 		if err != nil {
@@ -133,7 +133,7 @@ func Example_scanLinestring() {
 		}
 
 		if pnt.Valid {
-			output = append(output, gogis.Linestring(pnt.Linestring))
+			output = append(output, gogis.LineString(pnt.LineString))
 		}
 	}
 
@@ -196,7 +196,7 @@ func Example_insertPoint() {
 	}
 }
 
-func Example_insertLinestring() {
+func Example_insertLineString() {
 	// Launch database:
 	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
 	//
@@ -239,7 +239,7 @@ func Example_insertLinestring() {
 
 	// Execute the query.
 	if _, err = stmt.ExecContext(ctx,
-		gogis.Linestring{
+		gogis.LineString{
 			{
 				Coordinate: ewkb.Coordinate{
 					'x': 42.42,
