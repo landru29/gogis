@@ -28,6 +28,7 @@ func NewGeometry(opts ...func(*Geometry)) *Geometry {
 			&ewkb.MultiPoint{},
 			&ewkb.MultiLineString{},
 			&ewkb.MultiPolygon{},
+			&ewkb.Triangle{},
 		},
 	}
 

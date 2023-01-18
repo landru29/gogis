@@ -1,6 +1,9 @@
 package ewkb
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"fmt"
+)
 
 // LineString is a set of lines.
 type LineString struct {
@@ -16,7 +19,7 @@ func (l LineString) Type() GeometryType {
 // UnmarshalEWBK implements the Unmarshaler interface.
 func (l *LineString) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 	if record.Type != l.Type() {
-		return ErrWrongGeometryType
+		return fmt.Errorf("%w: found %d, expected %d", ErrWrongGeometryType, record.Type, l.Type())
 	}
 
 	l.SRID = record.SRID
