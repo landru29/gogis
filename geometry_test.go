@@ -207,6 +207,95 @@ func TestGeometryScan(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:                "multipolygon",
+			rawData:              []byte("010600000002000000010300000002000000040000001F85EB51B81E1CC0A4703D0AD7A30040EC51B81E85EB0F4085EB51B81E851DC0E17A14AE47E1E23F14AE47E17A1411401F85EB51B81E1CC0A4703D0AD7A30040040000003D0AD7A370BD2240B81E85EB51384B4085EB51B81E9555403D0AD7A3707D3FC0EC51B81E852B4340D7A3703D0A2757C03D0AD7A370BD2240B81E85EB51384B400103000000020000000400000048E17A14AE0731C0295C8FC2F52828407B14AE47E1FA2B40E17A14AE476131C0AE47E17A142E25400AD7A3703D8A2C4048E17A14AE0731C0295C8FC2F5282840040000001F85EB51B85E3340AE47E17A144E6340C3F5285C8F4A674048E17A14AE6F60C07B14AE47E14A6140EC51B81E851368C01F85EB51B85E3340AE47E17A144E6340"),
+			expectedGeometryType: ewkb.GeometryTypeMultiPolygon,
+			expectedGeometry: &ewkb.MultiPolygon{
+				Polygons: []ewkb.Polygon{
+					{
+						CoordinateGroup: ewkb.CoordinateGroup{
+							{
+								{
+									'x': -7.03,
+									'y': 2.08,
+								},
+								{
+									'x': 3.99,
+									'y': -7.38,
+								},
+								{
+									'x': 0.59,
+									'y': 4.27,
+								},
+								{
+									'x': -7.03,
+									'y': 2.08,
+								},
+							},
+							{
+								{
+									'x': 9.37,
+									'y': 54.44,
+								},
+								{
+									'x': 86.33,
+									'y': -31.49,
+								},
+								{
+									'x': 38.34,
+									'y': -92.61,
+								},
+								{
+									'x': 9.37,
+									'y': 54.44,
+								},
+							},
+						},
+					},
+					{
+						CoordinateGroup: ewkb.CoordinateGroup{
+							{
+								{
+									'x': -17.03,
+									'y': 12.08,
+								},
+								{
+									'x': 13.99,
+									'y': -17.38,
+								},
+								{
+									'x': 10.59,
+									'y': 14.27,
+								},
+								{
+									'x': -17.03,
+									'y': 12.08,
+								},
+							},
+							{
+								{
+									'x': 19.37,
+									'y': 154.44,
+								},
+								{
+									'x': 186.33,
+									'y': -131.49,
+								},
+								{
+									'x': 138.34,
+									'y': -192.61,
+								},
+								{
+									'x': 19.37,
+									'y': 154.44,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for idx := range fixtures {

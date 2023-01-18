@@ -32,8 +32,6 @@ func (m *MultiLineString) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 	m.LineStrings = make([]LineString, size)
 
 	for idx := range m.LineStrings {
-		record.Type = GeometryTypePoint
-
 		lineStr := &LineString{}
 		if err := (&Decoder{reader: record.DataStream}).Decode(lineStr); err != nil {
 			return err
