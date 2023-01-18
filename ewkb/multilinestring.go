@@ -7,6 +7,9 @@ import (
 )
 
 // MultiLineString is a MULTILINESTRING in database.
+//
+// A MultiLineString is a collection of LineStrings. A MultiLineString is
+// closed if each of its elements is closed.
 type MultiLineString struct {
 	SRID        *SystemReferenceID
 	LineStrings []LineString

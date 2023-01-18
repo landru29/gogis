@@ -2,6 +2,16 @@
 
 This package is an implementation of the PostGis database driver. Refer to documentation [https://pkg.go.dev/github.com/landru29/gogis](https://pkg.go.dev/github.com/landru29/gogis)
 
+The following types are currently implemented:
+* Point
+* LineString
+* Polygon
+* MultiPoint
+* MultiLineString
+* MultiPolygon
+* Triangle
+* CircularString
+
 ## Example
 
 ```golang

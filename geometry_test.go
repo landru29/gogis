@@ -329,6 +329,33 @@ func TestGeometryScan(t *testing.T) {
 				},
 			},
 		},
+		{
+			title:                "circularstring",
+			rawData:              []byte("01080000C0030000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040000000000000F03F000000000000004000000000000008400000000000001040"),
+			expectedGeometryType: ewkb.GeometryTypeCircularString,
+			expectedGeometry: &ewkb.CircularString{
+				CoordinateSet: []ewkb.Coordinate{
+					{
+						'x': -71.060316,
+						'y': 48.432044,
+						'z': 10,
+						'm': 30,
+					},
+					{
+						'x': 5,
+						'y': 6,
+						'z': 7,
+						'm': 8,
+					},
+					{
+						'x': 1,
+						'y': 2,
+						'z': 3,
+						'm': 4,
+					},
+				},
+			},
+		},
 	}
 
 	for idx := range fixtures {

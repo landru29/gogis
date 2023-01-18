@@ -15,6 +15,7 @@ const (
 	ErrTriangleWrongSize = Error("triangle has a wrong size")
 )
 
+// Triangle is a TRIANGLE in database.
 type Triangle struct {
 	SRID *SystemReferenceID
 	CoordinateSet

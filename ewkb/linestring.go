@@ -6,6 +6,15 @@ import (
 )
 
 // LineString is a set of lines.
+//
+// A LineString is a 1-dimensional line formed by a contiguous sequence
+// of line segments. Each line segment is defined by two points, with
+// the end point of one segment forming the start point of the next
+// segment. An OGC-valid LineString has either zero or two or more points,
+// but PostGIS also allows single-point LineStrings. LineStrings may cross
+// themselves (self-intersect). A LineString is closed if the start and
+// end points are the same. A LineString is simple if it does not
+// self-intersect.
 type LineString struct {
 	SRID *SystemReferenceID
 	CoordinateSet

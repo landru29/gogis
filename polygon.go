@@ -27,7 +27,7 @@ type NullPolygon struct {
 }
 
 // Scan implements the SQL driver.Scanner interface.
-func (l *NullPolygon) Scan(value interface{}) error {
+func (p *NullPolygon) Scan(value interface{}) error {
 	if value == nil {
 		return nil
 	}
@@ -38,54 +38,34 @@ func (l *NullPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	ringSet := make([]LineString, len(polygon.CoordinateGroup))
-
-	for idx0, ring := range polygon.CoordinateGroup {
-		pointSet := make([]Point, len(ring))
-		for idx1, pnt := range ring {
-			pointSet[idx1].Coordinate = pnt
-		}
-		ringSet[idx0] = LineString(pointSet)
-	}
-
-	l.Polygon = Polygon(ringSet)
-	l.Valid = true
+	p.Polygon = polygonFromEWKB(polygon)
+	p.Valid = true
 
 	return nil
 }
 
 // Scan implements the SQL driver.Scanner interface.
-func (l *Polygon) Scan(value interface{}) error {
+func (p *Polygon) Scan(value interface{}) error {
 	polygon := ewkb.Polygon{}
 
 	if err := ewkb.Unmarshal(&polygon, value); err != nil {
 		return err
 	}
 
-	ringSet := make([]LineString, len(polygon.CoordinateGroup))
-
-	for idx0, ring := range polygon.CoordinateGroup {
-		pointSet := make([]Point, len(ring))
-		for idx1, pnt := range ring {
-			pointSet[idx1].Coordinate = pnt
-		}
-		ringSet[idx0] = LineString(pointSet)
-	}
-
-	*l = Polygon(ringSet)
+	*p = polygonFromEWKB(polygon)
 
 	return nil
 }
 
 // Value implements the driver.Valuer interface.
-func (l Polygon) Value() (driver.Value, error) {
+func (p Polygon) Value() (driver.Value, error) {
 	var srid *ewkb.SystemReferenceID
 
 	polygon := ewkb.Polygon{
-		CoordinateGroup: make(ewkb.CoordinateGroup, len(l)),
+		CoordinateGroup: make(ewkb.CoordinateGroup, len(p)),
 	}
 
-	for idx0, ring := range l {
+	for idx0, ring := range p {
 		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
 		for idx1, pnt := range ring {
 			srid = pnt.SRID
@@ -95,14 +75,48 @@ func (l Polygon) Value() (driver.Value, error) {
 
 	polygon.SRID = srid
 
-	return ewkb.Marshal(polygon)
+	return ewkb.Marshal(polygonToEWKB(p))
 }
 
 // Value implements the driver.Valuer interface.
-func (l NullPolygon) Value() (driver.Value, error) {
-	if !l.Valid {
+func (p NullPolygon) Value() (driver.Value, error) {
+	if !p.Valid {
 		return nil, nil
 	}
 
-	return l.Polygon.Value()
+	return p.Polygon.Value()
+}
+
+func polygonFromEWKB(polygon ewkb.Polygon) Polygon {
+	ringSet := make([]LineString, len(polygon.CoordinateGroup))
+
+	for idx0, ring := range polygon.CoordinateGroup {
+		pointSet := make([]Point, len(ring))
+		for idx1, pnt := range ring {
+			pointSet[idx1].Coordinate = pnt
+		}
+		ringSet[idx0] = LineString(pointSet)
+	}
+
+	return Polygon(ringSet)
+}
+
+func polygonToEWKB(p Polygon) ewkb.Polygon {
+	var srid *ewkb.SystemReferenceID
+
+	polygon := ewkb.Polygon{
+		CoordinateGroup: make(ewkb.CoordinateGroup, len(p)),
+	}
+
+	for idx0, ring := range p {
+		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
+		for idx1, pnt := range ring {
+			srid = pnt.SRID
+			polygon.CoordinateGroup[idx0][idx1] = pnt.Coordinate
+		}
+	}
+
+	polygon.SRID = srid
+
+	return polygon
 }

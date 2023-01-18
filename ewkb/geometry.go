@@ -25,8 +25,8 @@ const (
 	// GeometryTypeGeometryCollection stands for geometryCollection.
 	GeometryTypeGeometryCollection GeometryType = 7
 
-	// GeometryTypeCircle stands for circle.
-	GeometryTypeCircle GeometryType = 8
+	// GeometryTypeCircularString stands for a curved string.
+	GeometryTypeCircularString GeometryType = 8
 
 	// GeometryTypeCompound stands for compound.
 	GeometryTypeCompound GeometryType = 9
