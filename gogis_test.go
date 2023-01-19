@@ -15,8 +15,6 @@ import (
 
 const (
 	dbQueryString = "SELECT coordinate FROM geometry"
-
-	dbExecString = "INSERT INTO geometry(coordinate) VALUES ($1)"
 )
 
 func matcher(expectedSQL, actualSQL string) error {
@@ -33,7 +31,6 @@ func matcher(expectedSQL, actualSQL string) error {
 }
 
 type testFixtureScan struct {
-	title            string
 	rawData          []byte
 	expectedGeometry sql.Scanner
 	scanner          sql.Scanner
@@ -42,35 +39,31 @@ type testFixtureScan struct {
 func scanTest(t *testing.T, fixture testFixtureScan) {
 	t.Helper()
 
-	t.Run(fmt.Sprintf("scan-%s", fixture.title), func(t *testing.T) {
+	dbSQL, mock, err := sqlmock.New(
+		sqlmock.QueryMatcherOption(sqlmock.QueryMatcherFunc(matcher)),
+	)
+	require.NoError(t, err)
 
-		dbSQL, mock, err := sqlmock.New(
-			sqlmock.QueryMatcherOption(sqlmock.QueryMatcherFunc(matcher)),
-		)
-		require.NoError(t, err)
+	mock.ExpectQuery(dbQueryString).WillReturnRows(
+		sqlmock.NewRows([]string{"coordinate"}).
+			AddRow(fixture.rawData))
 
-		mock.ExpectQuery(dbQueryString).WillReturnRows(
-			sqlmock.NewRows([]string{"coordinate"}).
-				AddRow(fixture.rawData))
+	rows, err := dbSQL.Query(dbQueryString)
+	require.NoError(t, err)
+	require.NoError(t, rows.Err())
 
-		rows, err := dbSQL.Query(dbQueryString)
-		require.NoError(t, err)
-		require.NoError(t, rows.Err())
+	defer func() {
+		_ = rows.Close()
+	}()
 
-		defer func() {
-			_ = rows.Close()
-		}()
+	if rows.Next() {
+		require.NoError(t, rows.Scan(fixture.scanner))
+	}
 
-		if rows.Next() {
-			require.NoError(t, rows.Scan(fixture.scanner))
-		}
-
-		assert.Equal(t, fixture.expectedGeometry, fixture.scanner)
-	})
+	assert.Equal(t, fixture.expectedGeometry, fixture.scanner)
 }
 
 type testFixtureValue struct {
-	title           string
 	expectedRawData []byte
 	valuer          driver.Valuer
 }
@@ -78,13 +71,15 @@ type testFixtureValue struct {
 func valueTest(t *testing.T, fixture testFixtureValue) {
 	t.Helper()
 
-	t.Run(fmt.Sprintf("value-%s", fixture.title), func(t *testing.T) {
-		out, err := fixture.valuer.Value()
-		require.NoError(t, err)
+	out, err := fixture.valuer.Value()
+	require.NoError(t, err)
 
-		dataByte, ok := out.([]byte)
-		require.True(t, ok, "should be []byte output")
+	if fixture.expectedRawData == nil && out == nil {
+		return
+	}
 
-		assert.Equal(t, strings.ToUpper(string(fixture.expectedRawData)), strings.ToUpper(string(dataByte)))
-	})
+	dataByte, ok := out.([]byte)
+	require.True(t, ok, "should be []byte output")
+
+	assert.Equal(t, strings.ToUpper(string(fixture.expectedRawData)), strings.ToUpper(string(dataByte)))
 }

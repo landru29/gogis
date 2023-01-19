@@ -28,7 +28,7 @@ type NullPoint struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (p *NullPoint) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -37,7 +37,7 @@ func (p *NullPoint) Scan(value interface{}) error {
 		return err
 	}
 
-	p.Point = Point(point)
+	p.Point = PointFromEWKB(point)
 	p.Valid = !p.Point.Coordinate.IsNull()
 
 	return nil
@@ -50,7 +50,7 @@ func (p *Point) Scan(value interface{}) error {
 		return err
 	}
 
-	*p = Point(point)
+	*p = PointFromEWKB(point)
 
 	return nil
 }
@@ -67,4 +67,9 @@ func (p NullPoint) Value() (driver.Value, error) {
 	}
 
 	return p.Point.Value()
+}
+
+// PointFromEWKB converts EWKB to Point.
+func PointFromEWKB(pnt ewkb.Point) Point {
+	return Point(pnt)
 }

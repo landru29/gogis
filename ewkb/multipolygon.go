@@ -57,6 +57,7 @@ func (m MultiPolygon) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
 	output = append(output, size...)
 
 	buffer := bytes.NewBuffer(nil)
+
 	for _, pnt := range m.Polygons {
 		if err := (&Encoder{writer: buffer, byteOrder: byteOrder}).Encode(pnt); err != nil {
 			return nil, err
@@ -78,5 +79,6 @@ func (m MultiPolygon) Layout() Layout {
 	if len(m.Polygons) > 0 {
 		return m.Polygons[0].Layout()
 	}
+
 	return layoutXY
 }

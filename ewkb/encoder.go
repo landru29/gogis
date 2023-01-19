@@ -21,7 +21,7 @@ type Encoder struct {
 	byteOrder binary.ByteOrder
 }
 
-// NewDecoder creates a EWKB decoder.
+// NewEncoder creates a EWKB encoder.
 func NewEncoder(writer io.Writer) *Encoder {
 	return &Encoder{
 		writer:    hex.NewEncoder(writer),
@@ -29,6 +29,7 @@ func NewEncoder(writer io.Writer) *Encoder {
 	}
 }
 
+// Encode encodes geometry to EWKB.
 func (e *Encoder) Encode(geoShape Marshaler) error {
 	output := make([]byte, 1+size32bit)
 

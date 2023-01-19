@@ -6,6 +6,7 @@ import (
 )
 
 const (
+	// ErrCircularStringWrongSize occurs when the number of verticies is not odd or is less than 3.
 	ErrCircularStringWrongSize = Error("circularstring has a wrong size (odd number of vertices >1)")
 )
 

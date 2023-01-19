@@ -1,0 +1,39 @@
+run:
+  timeout: 2m
+
+linters-settings:
+  cyclop:
+    max-complexity: 15
+  funlen:
+    lines: 100
+    statements: 40
+
+linters:
+  enable-all: true
+  disable:
+    - wrapcheck
+    - noctx
+    - paralleltest
+    - exhaustivestruct
+    - goerr113
+    - golint
+    - scopelint
+    - interfacer
+    - maligned
+    - godox
+    - exhaustruct
+    - dupl
+
+issues:
+  exclude-use-default: false
+  exclude-rules:
+
+    - path: .*_test\.go
+      linters:
+        - funlen
+        - lll
+        - bodyclose
+        - dupl
+        - goconst
+        - maintidx
+        - unparam

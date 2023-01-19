@@ -57,6 +57,7 @@ func (m MultiLineString) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error)
 	output = append(output, size...)
 
 	buffer := bytes.NewBuffer(nil)
+
 	for _, pnt := range m.LineStrings {
 		if err := (&Encoder{writer: buffer, byteOrder: byteOrder}).Encode(pnt); err != nil {
 			return nil, err
@@ -78,5 +79,6 @@ func (m MultiLineString) Layout() Layout {
 	if len(m.LineStrings) > 0 {
 		return m.LineStrings[0].Layout()
 	}
+
 	return layoutXY
 }

@@ -28,7 +28,7 @@ type NullTriangle struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (t *NullTriangle) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -38,13 +38,7 @@ func (t *NullTriangle) Scan(value interface{}) error {
 		return err
 	}
 
-	poly := make([]Point, len(triangle.CoordinateSet))
-
-	for idx, pnt := range triangle.CoordinateSet {
-		poly[idx].Coordinate = pnt
-	}
-
-	t.Triangle = Triangle(poly)
+	t.Triangle = TriangleFromEWKB(triangle)
 	t.Valid = true
 
 	return nil
@@ -58,13 +52,7 @@ func (t *Triangle) Scan(value interface{}) error {
 		return err
 	}
 
-	poly := make([]Point, len(triangle.CoordinateSet))
-
-	for idx, pnt := range triangle.CoordinateSet {
-		poly[idx].Coordinate = pnt
-	}
-
-	*t = Triangle(poly)
+	*t = TriangleFromEWKB(triangle)
 
 	return nil
 }
@@ -93,4 +81,15 @@ func (t NullTriangle) Value() (driver.Value, error) {
 	}
 
 	return t.Triangle.Value()
+}
+
+// TriangleFromEWKB converts EWKB to Triangle.
+func TriangleFromEWKB(triangle ewkb.Triangle) Triangle {
+	poly := make([]Point, len(triangle.CoordinateSet))
+
+	for idx, pnt := range triangle.CoordinateSet {
+		poly[idx].Coordinate = pnt
+	}
+
+	return Triangle(poly)
 }

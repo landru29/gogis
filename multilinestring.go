@@ -28,7 +28,7 @@ type NullMultiLineString struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (m *NullMultiLineString) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -38,13 +38,7 @@ func (m *NullMultiLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	polySet := make([]LineString, len(multi.LineStrings))
-
-	for idx0, poly := range multi.LineStrings {
-		polySet[idx0] = linestringFromEWKB(poly)
-	}
-
-	m.MultiLineString = MultiLineString(polySet)
+	m.MultiLineString = MultiLineStringFromEWKB(multi)
 	m.Valid = true
 
 	return nil
@@ -58,13 +52,7 @@ func (m *MultiLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	polySet := make([]LineString, len(multi.LineStrings))
-
-	for idx0, poly := range multi.LineStrings {
-		polySet[idx0] = linestringFromEWKB(poly)
-	}
-
-	*m = MultiLineString(polySet)
+	*m = MultiLineStringFromEWKB(multi)
 
 	return nil
 }
@@ -103,4 +91,15 @@ func (m MultiLineString) srid() *ewkb.SystemReferenceID {
 	}
 
 	return nil
+}
+
+// MultiLineStringFromEWKB converts EWKB to MultiLineString.
+func MultiLineStringFromEWKB(multi ewkb.MultiLineString) MultiLineString {
+	polySet := make([]LineString, len(multi.LineStrings))
+
+	for idx0, poly := range multi.LineStrings {
+		polySet[idx0] = LinestringFromEWKB(poly)
+	}
+
+	return MultiLineString(polySet)
 }

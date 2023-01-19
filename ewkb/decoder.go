@@ -58,11 +58,13 @@ func (e ExtendedWellKnownBytes) ReadFloat64() (float64, error) {
 
 // DecodeHeader decodes EWKB header.
 func DecodeHeader(reader io.Reader) (*ExtendedWellKnownBytes, error) {
-	var firstByte = make([]byte, size8bit)
+	firstByte := make([]byte, size8bit)
+
 	_, err := reader.Read(firstByte)
 	if err == io.EOF {
 		return &ExtendedWellKnownBytes{IsNil: true}, nil
 	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func DecodeHeader(reader io.Reader) (*ExtendedWellKnownBytes, error) {
 		return nil, ErrWrongByteOrder
 	}
 
-	var controlByte = make([]byte, size32bit)
+	controlByte := make([]byte, size32bit)
 	if _, err := reader.Read(controlByte); err != nil {
 		return nil, err
 	}

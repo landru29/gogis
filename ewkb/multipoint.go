@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-// Multipoint is a MULTIPOINT in database.
+// MultiPoint is a MULTIPOINT in database.
 //
 // A MultiPoint is a collection of Points.
 type MultiPoint struct {
@@ -56,6 +56,7 @@ func (m MultiPoint) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, error) {
 	output = append(output, size...)
 
 	buffer := bytes.NewBuffer(nil)
+
 	for _, pnt := range m.Points {
 		if err := (&Encoder{writer: buffer, byteOrder: byteOrder}).Encode(pnt); err != nil {
 			return nil, err
@@ -77,5 +78,6 @@ func (m MultiPoint) Layout() Layout {
 	if len(m.Points) > 0 {
 		return m.Points[0].Layout()
 	}
+
 	return layoutXY
 }

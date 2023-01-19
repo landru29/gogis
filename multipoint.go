@@ -28,7 +28,7 @@ type NullMultiPoint struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (m *NullMultiPoint) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -38,13 +38,7 @@ func (m *NullMultiPoint) Scan(value interface{}) error {
 		return err
 	}
 
-	pointSet := make([]Point, len(multi.Points))
-
-	for idx, pnt := range multi.Points {
-		pointSet[idx] = Point(pnt)
-	}
-
-	m.MultiPoint = MultiPoint(pointSet)
+	m.MultiPoint = MultiPointFromEWKB(multi)
 	m.Valid = true
 
 	return nil
@@ -58,13 +52,7 @@ func (m *MultiPoint) Scan(value interface{}) error {
 		return err
 	}
 
-	pointSet := make([]Point, len(multi.Points))
-
-	for idx, pnt := range multi.Points {
-		pointSet[idx] = Point(pnt)
-	}
-
-	*m = MultiPoint(pointSet)
+	*m = MultiPointFromEWKB(multi)
 
 	return nil
 }
@@ -93,4 +81,15 @@ func (m NullMultiPoint) Value() (driver.Value, error) {
 	}
 
 	return m.MultiPoint.Value()
+}
+
+// MultiPointFromEWKB converts EWKB to MultiPoint.
+func MultiPointFromEWKB(multi ewkb.MultiPoint) MultiPoint {
+	pointSet := make([]Point, len(multi.Points))
+
+	for idx, pnt := range multi.Points {
+		pointSet[idx] = Point(pnt)
+	}
+
+	return MultiPoint(pointSet)
 }

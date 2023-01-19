@@ -10,6 +10,10 @@ type Coordinate map[byte]float64
 
 // IsNull checks if coordinate is null.
 func (c Coordinate) IsNull() bool {
+	if len(c) == 0 {
+		return true
+	}
+
 	for _, coord := range c {
 		if coord != coord {
 			return true
@@ -41,6 +45,7 @@ func (c *Coordinate) UnmarshalEWBK(record ExtendedWellKnownBytes) error {
 
 	if pnt.isNull() {
 		*c = NewNullCoordinate(record.Layout)
+
 		return nil
 	}
 

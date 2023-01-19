@@ -28,7 +28,7 @@ type NullLineString struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (l *NullLineString) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -38,7 +38,7 @@ func (l *NullLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	l.LineString = linestringFromEWKB(linestring)
+	l.LineString = LinestringFromEWKB(linestring)
 	l.Valid = true
 
 	return nil
@@ -52,7 +52,7 @@ func (l *LineString) Scan(value interface{}) error {
 		return err
 	}
 
-	*l = linestringFromEWKB(linestring)
+	*l = LinestringFromEWKB(linestring)
 
 	return nil
 }
@@ -71,7 +71,8 @@ func (l NullLineString) Value() (driver.Value, error) {
 	return l.LineString.Value()
 }
 
-func linestringFromEWKB(linestring ewkb.LineString) LineString {
+// LinestringFromEWKB converts EWKB to LineString.
+func LinestringFromEWKB(linestring ewkb.LineString) LineString {
 	pointSet := make([]Point, len(linestring.CoordinateSet))
 
 	for idx, pnt := range linestring.CoordinateSet {
@@ -81,16 +82,16 @@ func linestringFromEWKB(linestring ewkb.LineString) LineString {
 	return LineString(pointSet)
 }
 
-func linestringToEWKB(l LineString) ewkb.LineString {
+func linestringToEWKB(line LineString) ewkb.LineString {
 	linestring := ewkb.LineString{
-		CoordinateSet: make(ewkb.CoordinateSet, len(l)),
+		CoordinateSet: make(ewkb.CoordinateSet, len(line)),
 	}
 
-	if len(l) > 0 {
-		linestring.SRID = l[0].SRID
+	if len(line) > 0 {
+		linestring.SRID = line[0].SRID
 	}
 
-	for idx, pnt := range l {
+	for idx, pnt := range line {
 		linestring.CoordinateSet[idx] = pnt.Coordinate
 	}
 

@@ -28,7 +28,7 @@ type NullPolygon struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (p *NullPolygon) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -38,7 +38,7 @@ func (p *NullPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	p.Polygon = polygonFromEWKB(polygon)
+	p.Polygon = PolygonFromEWKB(polygon)
 	p.Valid = true
 
 	return nil
@@ -52,7 +52,7 @@ func (p *Polygon) Scan(value interface{}) error {
 		return err
 	}
 
-	*p = polygonFromEWKB(polygon)
+	*p = PolygonFromEWKB(polygon)
 
 	return nil
 }
@@ -67,6 +67,7 @@ func (p Polygon) Value() (driver.Value, error) {
 
 	for idx0, ring := range p {
 		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
+
 		for idx1, pnt := range ring {
 			srid = pnt.SRID
 			polygon.CoordinateGroup[idx0][idx1] = pnt.Coordinate
@@ -87,7 +88,8 @@ func (p NullPolygon) Value() (driver.Value, error) {
 	return p.Polygon.Value()
 }
 
-func polygonFromEWKB(polygon ewkb.Polygon) Polygon {
+// PolygonFromEWKB converts EWKB to Polygon.
+func PolygonFromEWKB(polygon ewkb.Polygon) Polygon {
 	ringSet := make([]LineString, len(polygon.CoordinateGroup))
 
 	for idx0, ring := range polygon.CoordinateGroup {
@@ -95,21 +97,23 @@ func polygonFromEWKB(polygon ewkb.Polygon) Polygon {
 		for idx1, pnt := range ring {
 			pointSet[idx1].Coordinate = pnt
 		}
+
 		ringSet[idx0] = LineString(pointSet)
 	}
 
 	return Polygon(ringSet)
 }
 
-func polygonToEWKB(p Polygon) ewkb.Polygon {
+func polygonToEWKB(poly Polygon) ewkb.Polygon {
 	var srid *ewkb.SystemReferenceID
 
 	polygon := ewkb.Polygon{
-		CoordinateGroup: make(ewkb.CoordinateGroup, len(p)),
+		CoordinateGroup: make(ewkb.CoordinateGroup, len(poly)),
 	}
 
-	for idx0, ring := range p {
+	for idx0, ring := range poly {
 		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
+
 		for idx1, pnt := range ring {
 			srid = pnt.SRID
 			polygon.CoordinateGroup[idx0][idx1] = pnt.Coordinate

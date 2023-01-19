@@ -81,6 +81,7 @@ func (g *Geometry) Scan(value interface{}) error {
 		if geoShape.Type() == record.Type {
 			g.Geometry = geoShape
 			g.Valid = true
+
 			return g.Geometry.UnmarshalEWBK(*record)
 		}
 	}

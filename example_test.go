@@ -9,7 +9,7 @@ import (
 	"github.com/landru29/gogis/ewkb"
 )
 
-func Example_scanPoint() {
+func Example_scanPoint() { //nolint: wsl,nosnakecase,testableexamples
 	// Launch database:
 	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
 	//
@@ -32,7 +32,7 @@ func Example_scanPoint() {
 	ctx := context.Background()
 
 	// Connect to database.
-	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
+	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable") //nolint: varnamelen
 	if err != nil {
 		panic(err)
 	}
@@ -67,7 +67,7 @@ func Example_scanPoint() {
 		}
 
 		if pnt.Valid {
-			output = append(output, gogis.Point(pnt.Point))
+			output = append(output, pnt.Point)
 		}
 	}
 
@@ -75,7 +75,7 @@ func Example_scanPoint() {
 	fmt.Println(output)
 }
 
-func Example_scanLineString() {
+func Example_scanLineString() { //nolint: wsl,nosnakecase,testableexamples
 	// Launch database:
 	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
 	//
@@ -98,7 +98,7 @@ func Example_scanLineString() {
 	ctx := context.Background()
 
 	// Connect to database.
-	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
+	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable") //nolint: varnamelen
 	if err != nil {
 		panic(err)
 	}
@@ -133,7 +133,7 @@ func Example_scanLineString() {
 		}
 
 		if pnt.Valid {
-			output = append(output, gogis.LineString(pnt.LineString))
+			output = append(output, pnt.LineString)
 		}
 	}
 
@@ -141,7 +141,7 @@ func Example_scanLineString() {
 	fmt.Println(output)
 }
 
-func Example_insertPoint() {
+func Example_insertPoint() { //nolint: wsl,nosnakecase,testableexamples
 	// Launch database:
 	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
 	//
@@ -161,7 +161,7 @@ func Example_insertPoint() {
 	ctx := context.Background()
 
 	// Connect to database.
-	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
+	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable") //nolint: varnamelen
 	if err != nil {
 		panic(err)
 	}
@@ -196,7 +196,7 @@ func Example_insertPoint() {
 	}
 }
 
-func Example_insertLineString() {
+func Example_insertLineString() { //nolint: wsl,nosnakecase,testableexamples
 	// Launch database:
 	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
 	//
@@ -216,7 +216,7 @@ func Example_insertLineString() {
 	ctx := context.Background()
 
 	// Connect to database.
-	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
+	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable") //nolint: varnamelen
 	if err != nil {
 		panic(err)
 	}

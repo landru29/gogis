@@ -28,7 +28,7 @@ type NullCircularString struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (c *NullCircularString) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -38,13 +38,7 @@ func (c *NullCircularString) Scan(value interface{}) error {
 		return err
 	}
 
-	poly := make([]Point, len(triangle.CoordinateSet))
-
-	for idx, pnt := range triangle.CoordinateSet {
-		poly[idx].Coordinate = pnt
-	}
-
-	c.CircularString = CircularString(poly)
+	c.CircularString = CircularStringFromEWKB(triangle)
 	c.Valid = true
 
 	return nil
@@ -58,13 +52,7 @@ func (c *CircularString) Scan(value interface{}) error {
 		return err
 	}
 
-	poly := make([]Point, len(triangle.CoordinateSet))
-
-	for idx, pnt := range triangle.CoordinateSet {
-		poly[idx].Coordinate = pnt
-	}
-
-	*c = CircularString(poly)
+	*c = CircularStringFromEWKB(triangle)
 
 	return nil
 }
@@ -93,4 +81,15 @@ func (c NullCircularString) Value() (driver.Value, error) {
 	}
 
 	return c.CircularString.Value()
+}
+
+// CircularStringFromEWKB converts EWKB to CircularString.
+func CircularStringFromEWKB(circular ewkb.CircularString) CircularString {
+	poly := make([]Point, len(circular.CoordinateSet))
+
+	for idx, pnt := range circular.CoordinateSet {
+		poly[idx].Coordinate = pnt
+	}
+
+	return CircularString(poly)
 }

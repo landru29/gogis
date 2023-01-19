@@ -19,7 +19,6 @@ func TestGeometryScan(t *testing.T) {
 		rawData              []byte
 		expectedGeometryType ewkb.GeometryType
 		expectedGeometry     ewkb.Geometry
-		//scanner              sql.Scanner
 	}{
 		{
 			title:                "point",
@@ -361,7 +360,6 @@ func TestGeometryScan(t *testing.T) {
 		fixture := fixtures[idx]
 
 		t.Run(fixture.title, func(t *testing.T) {
-
 			dbSQL, mock, err := sqlmock.New(
 				sqlmock.QueryMatcherOption(sqlmock.QueryMatcherFunc(matcher)),
 			)
@@ -392,7 +390,7 @@ func TestGeometryScan(t *testing.T) {
 }
 
 // This example shows how to read any geometry from database.
-func Example_scanAny() {
+func Example_scanAny() { //nolint: wsl,nosnakecase,testableexamples
 	// Launch database:
 	// $> docker run --name db -p 5432:5432 -e POSTGRES_PASSWORD=tester -e POSTGRES_USER=tester -e POSTGRES_DB=test -d postgis/postgis:15-master
 	//
@@ -418,7 +416,7 @@ func Example_scanAny() {
 	ctx := context.Background()
 
 	// Connect to database.
-	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
+	db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable") //nolint: varnamelen
 	if err != nil {
 		panic(err)
 	}
@@ -475,6 +473,6 @@ func Example_scanAny() {
 			// process myCustom1
 			// case *myCustom2:
 			// process myCustom2
-		}
+		} //nolint: wsl
 	}
 }

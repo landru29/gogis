@@ -28,7 +28,7 @@ type NullMultiPolygon struct {
 
 // Scan implements the SQL driver.Scanner interface.
 func (p *NullMultiPolygon) Scan(value interface{}) error {
-	if value == nil {
+	if dataBytes, ok := value.([]byte); ok && dataBytes == nil {
 		return nil
 	}
 
@@ -38,13 +38,7 @@ func (p *NullMultiPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	polySet := make([]Polygon, len(multi.Polygons))
-
-	for idx0, poly := range multi.Polygons {
-		polySet[idx0] = polygonFromEWKB(poly)
-	}
-
-	p.MultiPolygon = MultiPolygon(polySet)
+	p.MultiPolygon = MultiPolygonFromEWKB(multi)
 	p.Valid = true
 
 	return nil
@@ -58,13 +52,7 @@ func (p *MultiPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	polySet := make([]Polygon, len(multi.Polygons))
-
-	for idx0, poly := range multi.Polygons {
-		polySet[idx0] = polygonFromEWKB(poly)
-	}
-
-	*p = MultiPolygon(polySet)
+	*p = MultiPolygonFromEWKB(multi)
 
 	return nil
 }
@@ -105,4 +93,15 @@ func (p MultiPolygon) srid() *ewkb.SystemReferenceID {
 	}
 
 	return nil
+}
+
+// MultiPolygonFromEWKB converts EWKB to MultiPolygon.
+func MultiPolygonFromEWKB(multi ewkb.MultiPolygon) MultiPolygon {
+	polySet := make([]Polygon, len(multi.Polygons))
+
+	for idx0, poly := range multi.Polygons {
+		polySet[idx0] = PolygonFromEWKB(poly)
+	}
+
+	return MultiPolygon(polySet)
 }
