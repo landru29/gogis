@@ -2,50 +2,50 @@
 // It implements some of the PostGIS geometry, and let users to implements
 // their own types:
 //
-//	import (
-//	    "io"
+//		import (
+//		    "io"
 //
-//	    "github.com/landru29/gogis/ewkb"
-//	)
+//		    "github.com/landru29/gogis/ewkb"
+//		)
 //
-//	type Custom struct {
-//	    databytes []byte
-//	}
-//
-//	func (c *Custom) UnmarshalEWBK(ewkb.ExtendedWellKnownBytes) error {
-//	   data, err := io.ReadAll()
-//	   c.dataBytes = data
-//	   return err
-//	}
-//
-//	func (c Custom) MarshalEWBK(ewkb.ExtendedWellKnownBytesHeader) ([]byte, error) {
-//	    return c.dataBytes, nil
-//	}
-//
-//	func (c Custom) Header() ewkb.ExtendedWellKnownBytesHeader {
-//	    return ewkb.ExtendedWellKnownBytesHeader{}
-//	}
-//
-//	func (c Custom) Type() ewkb.GeometryType {
-//	    return ewkb.GeometryType(42)
-//	}
-//
-//	// CustomSQL is to used with "sql" package.
-//	type CustomSQL Custom
-//
-//	func (c *CustomSQL) Scan(value interface{}) error {
-//		custo := Custom{}
-//
-//		if err := ewkb.Unmarshal(&custo, value); err != nil {
-//			return err
+//		type Custom struct {
+//		    databytes []byte
 //		}
 //
-//		*c = CustomSQL(custo)
+//		func (c *Custom) UnmarshalEWBK(ewkb.ExtendedWellKnownBytes) error {
+//		   data, err := io.ReadAll()
+//		   c.dataBytes = data
+//		   return err
+//		}
 //
-//		return nil
-//	}
+//		func (c Custom) MarshalEWBK(binary.ByteOrder) ([]byte, error) {
+//		    return c.dataBytes, nil
+//		}
 //
-//	func (c CustomSQL) Value() (driver.Value, error) {
-//	    return ewkb.Marshal(Custom(c))
-//	}
+//	    func (c Custom) Layout() ewkb.Layout {
+//		    return ewkb.Layout(0)
+//	    }
+//
+//		func (c Custom) Type() ewkb.GeometryType {
+//		    return ewkb.GeometryType(42)
+//		}
+//
+//		// CustomSQL is to used with "sql" package.
+//		type CustomSQL Custom
+//
+//		func (c *CustomSQL) Scan(value interface{}) error {
+//			custo := Custom{}
+//
+//			if err := ewkb.Unmarshal(&custo, value); err != nil {
+//				return err
+//			}
+//
+//			*c = CustomSQL(custo)
+//
+//			return nil
+//		}
+//
+//		func (c CustomSQL) Value() (driver.Value, error) {
+//		    return ewkb.Marshal(Custom(c))
+//		}
 package gogis
