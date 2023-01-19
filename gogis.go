@@ -1,5 +1,58 @@
 // Package gogis is the SQL driver for PostGIS (https://postgis.net/).
-// It implements some of the PostGIS geometry, and let users to implements
+// It implements some of the PostGIS geometry:
+//
+//	import (
+//		"context"
+//		"database/sql"
+//		_ "github.com/lib/pq"
+//		"github.com/landru29/gogis"
+//		"github.com/landru29/gogis/ewkb"
+//	)
+//
+//	func main() {
+//		ctx := context.Background()
+//
+//		db, err := sql.Open("postgres", "postgresql://tester:tester@localhost/test?sslmode=disable")
+//		if err != nil {
+//			panic(err)
+//		}
+//
+//		rows, err := db.QueryContext(ctx, `
+//			SELECT
+//				coordinate
+//			FROM geometries
+//		`)
+//		if err != nil {
+//			panic(err)
+//		}
+//
+//		if err := rows.Err(); err != nil {
+//			panic(err)
+//		}
+//
+//		defer func() {
+//			_ = rows.Close()
+//		}()
+//
+//		output := []gogis.Point{}
+//
+//		for rows.Next() {
+//			pnt := gogis.NullPoint{}
+//
+//			err = rows.Scan(&pnt)
+//			if err != nil {
+//				panic(err)
+//			}
+//
+//			if pnt.Valid {
+//				output = append(output, pnt.Point)
+//			}
+//		}
+//
+//		fmt.Println(output)
+//	}
+//
+// It also let users to implements
 // their own types:
 //
 //		import (
