@@ -111,7 +111,10 @@ import (
 
 // ModelConverter is the converter from EWKB to Model.
 type ModelConverter interface {
+	// FromEWKB converts EWKB data type to model.
 	FromEWKB(geometry interface{}) error
+
+	// ToEWKB converts model to EWKB.
 	ToEWKB() ewkb.Marshaler
 }
 

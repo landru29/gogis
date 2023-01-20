@@ -68,8 +68,6 @@ func main() {
 
 	// Read data.
 	for rows.Next() {
-		// Here you can inject your own type:
-		// geometry := gogis.NewFeometry(gogis.WithWellKnownGeometry(&myCustom1{}, &myCustom2{}))
 		geometry := gogis.NewGeometry()
 
 		err = rows.Scan(geometry)
@@ -78,28 +76,21 @@ func main() {
 		}
 
 		switch data := geometry.Geometry.(type) {
-		case *ewkb.Point:
+		case *gogis.Point:
 			// process point
 			fmt.Printf("* point %+v\n", data)
 
-		case *ewkb.LineString:
+		case *gogis.LineString:
 			// process linestring
 			fmt.Printf("* linestring %+v\n", data)
 
-		case *ewkb.Polygon:
+		case *gogis.Polygon:
 			// process polygon
 			fmt.Printf("* polygon %+v\n", data)
 
-		case *ewkb.MultiPoint:
+		case *gogis.MultiPoint:
 			// process multipoint
 			fmt.Printf("* multipoint %+v\n", data)
-
-		default:
-			// If you have your custom types, just add:
-			// case *myCustom1:
-			// process myCustom1
-			// case *myCustom2:
-			// process myCustom2
 		}
 	}
 }
@@ -152,12 +143,20 @@ func (c *CustomSQL) Scan(value interface{}) error {
         return err
     }
 
-    *c = CustomSQL(custo)
-
-    return nil
+    return c.FromEWKB(custo)
 }
 
 func (c CustomSQL) Value() (driver.Value, error) {
-    return ewkb.Marshal(Custom(c))
+    return ewkb.Marshal(c.ToEWKB())
+}
+
+func (c *CustomSQL) FromEWKB(geometry interface{}) error {
+    *c = CustomSQL(geometry)
+
+	return nil
+}
+
+func (c CustomSQL) ToEWKB() ewkb.Marshaler {
+	return Custom(c)
 }
 ```
