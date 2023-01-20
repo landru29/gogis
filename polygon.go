@@ -38,10 +38,9 @@ func (p *NullPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	p.Polygon = PolygonFromEWKB(polygon)
 	p.Valid = true
 
-	return nil
+	return (&p.Polygon).FromEWKB(polygon)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,9 +51,7 @@ func (p *Polygon) Scan(value interface{}) error {
 		return err
 	}
 
-	*p = PolygonFromEWKB(polygon)
-
-	return nil
+	return p.FromEWKB(polygon)
 }
 
 // Value implements the driver.Valuer interface.
@@ -88,8 +85,13 @@ func (p NullPolygon) Value() (driver.Value, error) {
 	return p.Polygon.Value()
 }
 
-// PolygonFromEWKB converts EWKB to Polygon.
-func PolygonFromEWKB(polygon ewkb.Polygon) Polygon {
+// FromEWKB implements the ModelConverter interface.
+func (p *Polygon) FromEWKB(from interface{}) error {
+	polygon, ok := from.(ewkb.Polygon)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	ringSet := make([]LineString, len(polygon.CoordinateGroup))
 
 	for idx0, ring := range polygon.CoordinateGroup {
@@ -101,7 +103,9 @@ func PolygonFromEWKB(polygon ewkb.Polygon) Polygon {
 		ringSet[idx0] = LineString(pointSet)
 	}
 
-	return Polygon(ringSet)
+	*p = Polygon(ringSet)
+
+	return nil
 }
 
 func polygonToEWKB(poly Polygon) ewkb.Polygon {

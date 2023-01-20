@@ -38,10 +38,9 @@ func (t *NullTriangle) Scan(value interface{}) error {
 		return err
 	}
 
-	t.Triangle = TriangleFromEWKB(triangle)
 	t.Valid = true
 
-	return nil
+	return (&t.Triangle).FromEWKB(triangle)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,9 +51,7 @@ func (t *Triangle) Scan(value interface{}) error {
 		return err
 	}
 
-	*t = TriangleFromEWKB(triangle)
-
-	return nil
+	return t.FromEWKB(triangle)
 }
 
 // Value implements the driver.Valuer interface.
@@ -83,13 +80,20 @@ func (t NullTriangle) Value() (driver.Value, error) {
 	return t.Triangle.Value()
 }
 
-// TriangleFromEWKB converts EWKB to Triangle.
-func TriangleFromEWKB(triangle ewkb.Triangle) Triangle {
+// FromEWKB implements the ModelConverter interface.
+func (t *Triangle) FromEWKB(from interface{}) error {
+	triangle, ok := from.(ewkb.Triangle)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	poly := make([]Point, len(triangle.CoordinateSet))
 
 	for idx, pnt := range triangle.CoordinateSet {
 		poly[idx].Coordinate = pnt
 	}
 
-	return Triangle(poly)
+	*t = Triangle(poly)
+
+	return nil
 }

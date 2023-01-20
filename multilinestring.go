@@ -38,10 +38,9 @@ func (m *NullMultiLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	m.MultiLineString = MultiLineStringFromEWKB(multi)
 	m.Valid = true
 
-	return nil
+	return (&m.MultiLineString).FromEWKB(multi)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,9 +51,7 @@ func (m *MultiLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	*m = MultiLineStringFromEWKB(multi)
-
-	return nil
+	return m.FromEWKB(multi)
 }
 
 // Value implements the driver.Valuer interface.
@@ -93,13 +90,22 @@ func (m MultiLineString) srid() *ewkb.SystemReferenceID {
 	return nil
 }
 
-// MultiLineStringFromEWKB converts EWKB to MultiLineString.
-func MultiLineStringFromEWKB(multi ewkb.MultiLineString) MultiLineString {
+// FromEWKB implements the ModelConverter interface.
+func (m *MultiLineString) FromEWKB(from interface{}) error {
+	multi, ok := from.(ewkb.MultiLineString)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	polySet := make([]LineString, len(multi.LineStrings))
 
 	for idx0, poly := range multi.LineStrings {
-		polySet[idx0] = LinestringFromEWKB(poly)
+		if err := (&polySet[idx0]).FromEWKB(poly); err != nil {
+			return err
+		}
 	}
 
-	return MultiLineString(polySet)
+	*m = MultiLineString(polySet)
+
+	return nil
 }

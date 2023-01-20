@@ -102,3 +102,8 @@
 //		    return ewkb.Marshal(Custom(c))
 //		}
 package gogis
+
+// ModelConverter is the converter from EWKB to Model.
+type ModelConverter interface {
+	FromEWKB(geometry interface{}) error
+}

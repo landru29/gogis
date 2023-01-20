@@ -38,10 +38,9 @@ func (l *NullLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	l.LineString = LinestringFromEWKB(linestring)
 	l.Valid = true
 
-	return nil
+	return (&l.LineString).FromEWKB(linestring)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,9 +51,7 @@ func (l *LineString) Scan(value interface{}) error {
 		return err
 	}
 
-	*l = LinestringFromEWKB(linestring)
-
-	return nil
+	return l.FromEWKB(linestring)
 }
 
 // Value implements the driver.Valuer interface.
@@ -71,15 +68,22 @@ func (l NullLineString) Value() (driver.Value, error) {
 	return l.LineString.Value()
 }
 
-// LinestringFromEWKB converts EWKB to LineString.
-func LinestringFromEWKB(linestring ewkb.LineString) LineString {
+// FromEWKB implements the ModelConverter interface.
+func (l *LineString) FromEWKB(from interface{}) error {
+	linestring, ok := from.(ewkb.LineString)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	pointSet := make([]Point, len(linestring.CoordinateSet))
 
 	for idx, pnt := range linestring.CoordinateSet {
 		pointSet[idx].Coordinate = pnt
 	}
 
-	return LineString(pointSet)
+	*l = LineString(pointSet)
+
+	return nil
 }
 
 func linestringToEWKB(line LineString) ewkb.LineString {
