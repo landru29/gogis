@@ -38,10 +38,9 @@ func (m *NullMultiPoint) Scan(value interface{}) error {
 		return err
 	}
 
-	m.MultiPoint = MultiPointFromEWKB(multi)
 	m.Valid = true
 
-	return nil
+	return (&m.MultiPoint).FromEWKB(multi)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,13 +51,25 @@ func (m *MultiPoint) Scan(value interface{}) error {
 		return err
 	}
 
-	*m = MultiPointFromEWKB(multi)
-
-	return nil
+	return m.FromEWKB(multi)
 }
 
 // Value implements the driver.Valuer interface.
 func (m MultiPoint) Value() (driver.Value, error) {
+	return ewkb.Marshal(m.ToEWKB())
+}
+
+// Value implements the driver.Valuer interface.
+func (m NullMultiPoint) Value() (driver.Value, error) {
+	if !m.Valid {
+		return nil, nil
+	}
+
+	return m.MultiPoint.Value()
+}
+
+// ToEWKB implements the ModelConverter interface.
+func (m MultiPoint) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	multi := ewkb.MultiPoint{
 		Points: make([]ewkb.Point, len(m)),
 	}
@@ -71,25 +82,23 @@ func (m MultiPoint) Value() (driver.Value, error) {
 		multi.Points[idx] = ewkb.Point(pnt)
 	}
 
-	return ewkb.Marshal(multi)
+	return &multi
 }
 
-// Value implements the driver.Valuer interface.
-func (m NullMultiPoint) Value() (driver.Value, error) {
-	if !m.Valid {
-		return nil, nil
+// FromEWKB implements the ModelConverter interface.
+func (m *MultiPoint) FromEWKB(from interface{}) error {
+	multi, ok := fromPtr(from).(ewkb.MultiPoint)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
 	}
 
-	return m.MultiPoint.Value()
-}
-
-// MultiPointFromEWKB converts EWKB to MultiPoint.
-func MultiPointFromEWKB(multi ewkb.MultiPoint) MultiPoint {
 	pointSet := make([]Point, len(multi.Points))
 
 	for idx, pnt := range multi.Points {
 		pointSet[idx] = Point(pnt)
 	}
 
-	return MultiPoint(pointSet)
+	*m = MultiPoint(pointSet)
+
+	return nil
 }

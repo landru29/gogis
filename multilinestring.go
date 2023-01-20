@@ -38,10 +38,9 @@ func (m *NullMultiLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	m.MultiLineString = MultiLineStringFromEWKB(multi)
 	m.Valid = true
 
-	return nil
+	return (&m.MultiLineString).FromEWKB(multi)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,26 +51,12 @@ func (m *MultiLineString) Scan(value interface{}) error {
 		return err
 	}
 
-	*m = MultiLineStringFromEWKB(multi)
-
-	return nil
+	return m.FromEWKB(multi)
 }
 
 // Value implements the driver.Valuer interface.
 func (m MultiLineString) Value() (driver.Value, error) {
-	multi := ewkb.MultiLineString{
-		LineStrings: make([]ewkb.LineString, len(m)),
-	}
-
-	if len(m) > 0 {
-		multi.SRID = m.srid()
-	}
-
-	for idx, poly := range m {
-		multi.LineStrings[idx] = linestringToEWKB(poly)
-	}
-
-	return ewkb.Marshal(multi)
+	return ewkb.Marshal(m.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -93,13 +78,38 @@ func (m MultiLineString) srid() *ewkb.SystemReferenceID {
 	return nil
 }
 
-// MultiLineStringFromEWKB converts EWKB to MultiLineString.
-func MultiLineStringFromEWKB(multi ewkb.MultiLineString) MultiLineString {
+// ToEWKB implements the ModelConverter interface.
+func (m MultiLineString) ToEWKB() ewkb.Geometry { //nolint: ireturn
+	multi := ewkb.MultiLineString{
+		LineStrings: make([]ewkb.LineString, len(m)),
+	}
+
+	multi.SRID = m.srid()
+
+	for idx, poly := range m {
+		multiline, _ := poly.ToEWKB().(*ewkb.LineString)
+		multi.LineStrings[idx] = *multiline
+	}
+
+	return &multi
+}
+
+// FromEWKB implements the ModelConverter interface.
+func (m *MultiLineString) FromEWKB(from interface{}) error {
+	multi, ok := fromPtr(from).(ewkb.MultiLineString)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	polySet := make([]LineString, len(multi.LineStrings))
 
 	for idx0, poly := range multi.LineStrings {
-		polySet[idx0] = LinestringFromEWKB(poly)
+		if err := (&polySet[idx0]).FromEWKB(poly); err != nil {
+			return err
+		}
 	}
 
-	return MultiLineString(polySet)
+	*m = MultiLineString(polySet)
+
+	return nil
 }

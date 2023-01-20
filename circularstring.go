@@ -13,11 +13,11 @@ type CircularString []Point
 // NullCircularString implements the SQL driver.Scanner interface so it
 // can be used as a scan destination:
 //
-//	var triangle gogis.NullCircularString
-//	err := db.QueryRow("SELECT coordinate FROM foo WHERE id=?", id).Scan(&triangle)
+//	var circle gogis.NullCircularString
+//	err := db.QueryRow("SELECT coordinate FROM foo WHERE id=?", id).Scan(&circle)
 //	...
-//	if triangle.Valid {
-//	   // use triangle.CircularString
+//	if circle.Valid {
+//	   // use circle.CircularString
 //	} else {
 //	   // NULL value
 //	}
@@ -32,46 +32,31 @@ func (c *NullCircularString) Scan(value interface{}) error {
 		return nil
 	}
 
-	triangle := ewkb.CircularString{}
+	circle := ewkb.CircularString{}
 
-	if err := ewkb.Unmarshal(&triangle, value); err != nil {
+	if err := ewkb.Unmarshal(&circle, value); err != nil {
 		return err
 	}
 
-	c.CircularString = CircularStringFromEWKB(triangle)
 	c.Valid = true
 
-	return nil
+	return (&c.CircularString).FromEWKB(circle)
 }
 
 // Scan implements the SQL driver.Scanner interface.
 func (c *CircularString) Scan(value interface{}) error {
-	triangle := ewkb.CircularString{}
+	circle := ewkb.CircularString{}
 
-	if err := ewkb.Unmarshal(&triangle, value); err != nil {
+	if err := ewkb.Unmarshal(&circle, value); err != nil {
 		return err
 	}
 
-	*c = CircularStringFromEWKB(triangle)
-
-	return nil
+	return c.FromEWKB(circle)
 }
 
 // Value implements the driver.Valuer interface.
 func (c CircularString) Value() (driver.Value, error) {
-	var srid *ewkb.SystemReferenceID
-
-	triangle := ewkb.CircularString{
-		CoordinateSet: make(ewkb.CoordinateSet, len(c)),
-	}
-
-	for idx, pnt := range c {
-		triangle.CoordinateSet[idx] = pnt.Coordinate
-	}
-
-	triangle.SRID = srid
-
-	return ewkb.Marshal(triangle)
+	return ewkb.Marshal(c.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -83,13 +68,37 @@ func (c NullCircularString) Value() (driver.Value, error) {
 	return c.CircularString.Value()
 }
 
-// CircularStringFromEWKB converts EWKB to CircularString.
-func CircularStringFromEWKB(circular ewkb.CircularString) CircularString {
+// ToEWKB implements the ModelConverter interface.
+func (c CircularString) ToEWKB() ewkb.Geometry { //nolint: ireturn
+	var srid *ewkb.SystemReferenceID
+
+	circle := ewkb.CircularString{
+		CoordinateSet: make(ewkb.CoordinateSet, len(c)),
+	}
+
+	for idx, pnt := range c {
+		circle.CoordinateSet[idx] = pnt.Coordinate
+	}
+
+	circle.SRID = srid
+
+	return &circle
+}
+
+// FromEWKB implements the ModelConverter interface.
+func (c *CircularString) FromEWKB(from interface{}) error {
+	circular, ok := fromPtr(from).(ewkb.CircularString)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	poly := make([]Point, len(circular.CoordinateSet))
 
 	for idx, pnt := range circular.CoordinateSet {
 		poly[idx].Coordinate = pnt
 	}
 
-	return CircularString(poly)
+	*c = CircularString(poly)
+
+	return nil
 }

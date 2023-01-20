@@ -38,10 +38,9 @@ func (p *NullMultiPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	p.MultiPolygon = MultiPolygonFromEWKB(multi)
 	p.Valid = true
 
-	return nil
+	return (&p.MultiPolygon).FromEWKB(multi)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,26 +51,12 @@ func (p *MultiPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	*p = MultiPolygonFromEWKB(multi)
-
-	return nil
+	return p.FromEWKB(multi)
 }
 
 // Value implements the driver.Valuer interface.
 func (p MultiPolygon) Value() (driver.Value, error) {
-	multi := ewkb.MultiPolygon{
-		Polygons: make([]ewkb.Polygon, len(p)),
-	}
-
-	if len(p) > 0 {
-		multi.SRID = p.srid()
-	}
-
-	for idx, poly := range p {
-		multi.Polygons[idx] = polygonToEWKB(poly)
-	}
-
-	return ewkb.Marshal(multi)
+	return ewkb.Marshal(p.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -95,13 +80,40 @@ func (p MultiPolygon) srid() *ewkb.SystemReferenceID {
 	return nil
 }
 
-// MultiPolygonFromEWKB converts EWKB to MultiPolygon.
-func MultiPolygonFromEWKB(multi ewkb.MultiPolygon) MultiPolygon {
+// ToEWKB implements the ModelConverter interface.
+func (p MultiPolygon) ToEWKB() ewkb.Geometry { //nolint: ireturn
+	multi := ewkb.MultiPolygon{
+		Polygons: make([]ewkb.Polygon, len(p)),
+	}
+
+	if len(p) > 0 {
+		multi.SRID = p.srid()
+	}
+
+	for idx, poly := range p {
+		polygon, _ := poly.ToEWKB().(*ewkb.Polygon)
+		multi.Polygons[idx] = *polygon
+	}
+
+	return &multi
+}
+
+// FromEWKB implements the ModelConverter interface.
+func (p *MultiPolygon) FromEWKB(from interface{}) error {
+	multi, ok := fromPtr(from).(ewkb.MultiPolygon)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	polySet := make([]Polygon, len(multi.Polygons))
 
 	for idx0, poly := range multi.Polygons {
-		polySet[idx0] = PolygonFromEWKB(poly)
+		if err := (&polySet[idx0]).FromEWKB(poly); err != nil {
+			return err
+		}
 	}
 
-	return MultiPolygon(polySet)
+	*p = MultiPolygon(polySet)
+
+	return nil
 }

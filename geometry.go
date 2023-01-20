@@ -12,43 +12,25 @@ import (
 // This is used when user doesn't know which geometry to retrieve from database.
 type Geometry struct {
 	Type     ewkb.GeometryType
-	Geometry ewkb.Geometry
+	Geometry interface{}
 	Valid    bool
 
-	wellknown []ewkb.Geometry
+	wellknown BindSet
 }
 
 // NewGeometry creates a new Geometry.
-func NewGeometry(opts ...func(*Geometry)) *Geometry {
-	output := &Geometry{
-		wellknown: []ewkb.Geometry{
-			&ewkb.Point{},
-			&ewkb.LineString{},
-			&ewkb.Polygon{},
-			&ewkb.MultiPoint{},
-			&ewkb.MultiLineString{},
-			&ewkb.MultiPolygon{},
-			&ewkb.Triangle{},
-			&ewkb.CircularString{},
-		},
-	}
+func NewGeometry(opts ...func(interface{})) *Geometry {
+	output := &Geometry{}
 
 	for _, opt := range opts {
 		opt(output)
 	}
 
-	return output
-}
-
-// WithWellKnownGeometry add custom Geometry to the wellknown.
-func WithWellKnownGeometry(geometry ...ewkb.Geometry) func(*Geometry) {
-	return func(shape *Geometry) {
-		wellknown := []ewkb.Geometry{}
-		wellknown = append(wellknown, geometry...)
-		wellknown = append(wellknown, shape.wellknown...)
-
-		shape.wellknown = wellknown
+	if len(opts) == 0 {
+		output.wellknown = DefaultWellKnownBinding()
 	}
+
+	return output
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -77,12 +59,15 @@ func (g *Geometry) Scan(value interface{}) error {
 
 	g.Type = record.Type
 
-	for _, geoShape := range g.wellknown {
-		if geoShape.Type() == record.Type {
-			g.Geometry = geoShape
-			g.Valid = true
+	for _, bind := range g.wellknown {
+		if bind.ewkbType.Type() == record.Type {
+			if err := bind.ewkbType.UnmarshalEWBK(*record); err != nil {
+				return err
+			}
 
-			return g.Geometry.UnmarshalEWBK(*record)
+			g.Geometry = bind.modelType
+
+			return bind.modelType.FromEWKB(bind.ewkbType)
 		}
 	}
 
@@ -91,9 +76,14 @@ func (g *Geometry) Scan(value interface{}) error {
 
 // Value implements the driver Valuer interface.
 func (g *Geometry) Value() (driver.Value, error) {
-	if !g.Valid {
+	if !g.Valid || g.Geometry == nil {
 		return nil, nil
 	}
 
-	return ewkb.Marshal(g.Geometry)
+	converter, ok := g.Geometry.(ModelConverter)
+	if !ok {
+		return nil, ewkb.ErrIncompatibleFormat
+	}
+
+	return ewkb.Marshal(converter.ToEWKB())
 }

@@ -38,10 +38,9 @@ func (p *NullPolygon) Scan(value interface{}) error {
 		return err
 	}
 
-	p.Polygon = PolygonFromEWKB(polygon)
 	p.Valid = true
 
-	return nil
+	return (&p.Polygon).FromEWKB(polygon)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -52,9 +51,7 @@ func (p *Polygon) Scan(value interface{}) error {
 		return err
 	}
 
-	*p = PolygonFromEWKB(polygon)
-
-	return nil
+	return p.FromEWKB(polygon)
 }
 
 // Value implements the driver.Valuer interface.
@@ -76,7 +73,7 @@ func (p Polygon) Value() (driver.Value, error) {
 
 	polygon.SRID = srid
 
-	return ewkb.Marshal(polygonToEWKB(p))
+	return ewkb.Marshal(p.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -88,8 +85,13 @@ func (p NullPolygon) Value() (driver.Value, error) {
 	return p.Polygon.Value()
 }
 
-// PolygonFromEWKB converts EWKB to Polygon.
-func PolygonFromEWKB(polygon ewkb.Polygon) Polygon {
+// FromEWKB implements the ModelConverter interface.
+func (p *Polygon) FromEWKB(from interface{}) error {
+	polygon, ok := fromPtr(from).(ewkb.Polygon)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
 	ringSet := make([]LineString, len(polygon.CoordinateGroup))
 
 	for idx0, ring := range polygon.CoordinateGroup {
@@ -101,17 +103,20 @@ func PolygonFromEWKB(polygon ewkb.Polygon) Polygon {
 		ringSet[idx0] = LineString(pointSet)
 	}
 
-	return Polygon(ringSet)
+	*p = Polygon(ringSet)
+
+	return nil
 }
 
-func polygonToEWKB(poly Polygon) ewkb.Polygon {
+// ToEWKB implements the ModelConverter interface.
+func (p Polygon) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	var srid *ewkb.SystemReferenceID
 
 	polygon := ewkb.Polygon{
-		CoordinateGroup: make(ewkb.CoordinateGroup, len(poly)),
+		CoordinateGroup: make(ewkb.CoordinateGroup, len(p)),
 	}
 
-	for idx0, ring := range poly {
+	for idx0, ring := range p {
 		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
 
 		for idx1, pnt := range ring {
@@ -122,5 +127,5 @@ func polygonToEWKB(poly Polygon) ewkb.Polygon {
 
 	polygon.SRID = srid
 
-	return polygon
+	return &polygon
 }

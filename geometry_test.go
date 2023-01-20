@@ -18,13 +18,13 @@ func TestGeometryScan(t *testing.T) {
 		title                string
 		rawData              []byte
 		expectedGeometryType ewkb.GeometryType
-		expectedGeometry     ewkb.Geometry
+		expectedGeometry     interface{}
 	}{
 		{
 			title:                "point",
 			rawData:              []byte("01010000C03CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40"),
 			expectedGeometryType: ewkb.GeometryTypePoint,
-			expectedGeometry: &ewkb.Point{
+			expectedGeometry: &gogis.Point{
 				Coordinate: ewkb.Coordinate{
 					'x': -71.060316,
 					'y': 48.432044,
@@ -37,15 +37,17 @@ func TestGeometryScan(t *testing.T) {
 			title:                "linestring",
 			rawData:              []byte("01020000C0020000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040"),
 			expectedGeometryType: ewkb.GeometryTypeLineString,
-			expectedGeometry: &ewkb.LineString{
-				CoordinateSet: ewkb.CoordinateSet{
-					{
+			expectedGeometry: &gogis.LineString{
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': -71.060316,
 						'y': 48.432044,
-						'z': 10,
-						'm': 30,
+						'z': 10.0,
+						'm': 30.0,
 					},
-					{
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': 5,
 						'y': 6,
 						'z': 7,
@@ -58,62 +60,74 @@ func TestGeometryScan(t *testing.T) {
 			title:                "linestring empty",
 			rawData:              []byte("010200000000000000"),
 			expectedGeometryType: ewkb.GeometryTypeLineString,
-			expectedGeometry: &ewkb.LineString{
-				CoordinateSet: ewkb.CoordinateSet{},
-			},
+			expectedGeometry:     &gogis.LineString{},
 		},
 		{
 			title:                "polygon",
 			rawData:              []byte("01030000C002000000040000007B14AE47E1DA51C07B14AE47E15A454000000000000010400000000000001440EC51B81E856B31C0F6285C8FC215454000000000000010400000000000001440EC51B81E856B31C07B14AE47E1CA5140000000000000104000000000000014407B14AE47E1DA51C07B14AE47E15A45400000000000001040000000000000144004000000000000000000F03F0000000000000040000000000000084000000000000010400000000000001040000000000000144000000000000018400000000000001C400000000000001C40000000000000204000000000000022400000000000000000000000000000F03F000000000000004000000000000008400000000000001040"),
 			expectedGeometryType: ewkb.GeometryTypePolygon,
-			expectedGeometry: &ewkb.Polygon{
-				CoordinateGroup: ewkb.CoordinateGroup{
-					{
-						{
-							'x': -71.42,
-							'y': 42.71,
-							'z': 4,
-							'm': 5,
-						},
-						{
-							'x': -17.42,
-							'y': 42.17,
-							'z': 4,
-							'm': 5,
-						},
-						{
-							'x': -17.42,
-							'y': 71.17,
-							'z': 4,
-							'm': 5,
-						},
-						{
+			expectedGeometry: &gogis.Polygon{
+				gogis.LineString{
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
 							'x': -71.42,
 							'y': 42.71,
 							'z': 4,
 							'm': 5,
 						},
 					},
-					{
-						{
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
+							'x': -17.42,
+							'y': 42.17,
+							'z': 4,
+							'm': 5,
+						},
+					},
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
+							'x': -17.42,
+							'y': 71.17,
+							'z': 4,
+							'm': 5,
+						},
+					},
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
+							'x': -71.42,
+							'y': 42.71,
+							'z': 4,
+							'm': 5,
+						},
+					},
+				},
+				gogis.LineString{
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
 							'x': 1,
 							'y': 2,
 							'z': 3,
 							'm': 4,
 						},
-						{
+					},
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
 							'x': 4,
 							'y': 5,
 							'z': 6,
 							'm': 7,
 						},
-						{
+					},
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
 							'x': 7,
 							'y': 8,
 							'z': 9,
 							'm': 0,
 						},
-						{
+					},
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
 							'x': 1,
 							'y': 2,
 							'z': 3,
@@ -127,39 +141,37 @@ func TestGeometryScan(t *testing.T) {
 			title:                "multipoint",
 			rawData:              []byte("01040000C00400000001010000C07B14AE47E1DA51C07B14AE47E15A45400000000000001040000000000000144001010000C0EC51B81E856B31C0F6285C8FC21545400000000000001040000000000000144001010000C0EC51B81E856B31C07B14AE47E1CA51400000000000001040000000000000144001010000C07B14AE47E1DA51C07B14AE47E15A454000000000000010400000000000001440"),
 			expectedGeometryType: ewkb.GeometryTypeMultiPoint,
-			expectedGeometry: &ewkb.MultiPoint{
-				Points: []ewkb.Point{
-					{
-						Coordinate: ewkb.Coordinate{
-							'x': -71.42,
-							'y': 42.71,
-							'z': 4,
-							'm': 5,
-						},
+			expectedGeometry: &gogis.MultiPoint{
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
+						'm': 5,
 					},
-					{
-						Coordinate: ewkb.Coordinate{
-							'x': -17.42,
-							'y': 42.17,
-							'z': 4,
-							'm': 5,
-						},
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
+						'x': -17.42,
+						'y': 42.17,
+						'z': 4,
+						'm': 5,
 					},
-					{
-						Coordinate: ewkb.Coordinate{
-							'x': -17.42,
-							'y': 71.17,
-							'z': 4,
-							'm': 5,
-						},
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
+						'x': -17.42,
+						'y': 71.17,
+						'z': 4,
+						'm': 5,
 					},
-					{
-						Coordinate: ewkb.Coordinate{
-							'x': -71.42,
-							'y': 42.71,
-							'z': 4,
-							'm': 5,
-						},
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
+						'x': -71.42,
+						'y': 42.71,
+						'z': 4,
+						'm': 5,
 					},
 				},
 			},
@@ -168,38 +180,40 @@ func TestGeometryScan(t *testing.T) {
 			title:                "multilinestring",
 			rawData:              []byte("01050000C00200000001020000C002000000F6285C8FC23545403D0AD7A3703D38C01F85EB51B81E4540EC51B81E856B38C0000000000000144000000000000018400000000000001C40000000000000204001020000C0020000003D0AD7A370CD6140A4703D0AD7837AC048E17A14AEC761407B14AE47E11A5FC00000000000002E40000000000000304000000000000031400000000000003240"),
 			expectedGeometryType: ewkb.GeometryTypeMultiLineString,
-			expectedGeometry: &ewkb.MultiLineString{
-				LineStrings: []ewkb.LineString{
-					{
-						CoordinateSet: []ewkb.Coordinate{
-							{
-								'x': 42.42,
-								'y': -24.24,
-								'z': 42.24,
-								'm': -24.42,
-							},
-							{
-								'x': 5,
-								'y': 6,
-								'z': 7,
-								'm': 8,
-							},
+			expectedGeometry: &gogis.MultiLineString{
+				gogis.LineString{
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
+							'x': 42.42,
+							'y': -24.24,
+							'z': 42.24,
+							'm': -24.42,
 						},
 					},
-					{
-						CoordinateSet: []ewkb.Coordinate{
-							{
-								'x': 142.42,
-								'y': -424.24,
-								'z': 142.24,
-								'm': -124.42,
-							},
-							{
-								'x': 15,
-								'y': 16,
-								'z': 17,
-								'm': 18,
-							},
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
+							'x': 5,
+							'y': 6,
+							'z': 7,
+							'm': 8,
+						},
+					},
+				},
+				gogis.LineString{
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
+							'x': 142.42,
+							'y': -424.24,
+							'z': 142.24,
+							'm': -124.42,
+						},
+					},
+					gogis.Point{
+						Coordinate: ewkb.Coordinate{
+							'x': 15,
+							'y': 16,
+							'z': 17,
+							'm': 18,
 						},
 					},
 				},
@@ -209,85 +223,111 @@ func TestGeometryScan(t *testing.T) {
 			title:                "multipolygon",
 			rawData:              []byte("010600000002000000010300000002000000040000001F85EB51B81E1CC0A4703D0AD7A30040EC51B81E85EB0F4085EB51B81E851DC0E17A14AE47E1E23F14AE47E17A1411401F85EB51B81E1CC0A4703D0AD7A30040040000003D0AD7A370BD2240B81E85EB51384B4085EB51B81E9555403D0AD7A3707D3FC0EC51B81E852B4340D7A3703D0A2757C03D0AD7A370BD2240B81E85EB51384B400103000000020000000400000048E17A14AE0731C0295C8FC2F52828407B14AE47E1FA2B40E17A14AE476131C0AE47E17A142E25400AD7A3703D8A2C4048E17A14AE0731C0295C8FC2F5282840040000001F85EB51B85E3340AE47E17A144E6340C3F5285C8F4A674048E17A14AE6F60C07B14AE47E14A6140EC51B81E851368C01F85EB51B85E3340AE47E17A144E6340"),
 			expectedGeometryType: ewkb.GeometryTypeMultiPolygon,
-			expectedGeometry: &ewkb.MultiPolygon{
-				Polygons: []ewkb.Polygon{
-					{
-						CoordinateGroup: ewkb.CoordinateGroup{
-							{
-								{
-									'x': -7.03,
-									'y': 2.08,
-								},
-								{
-									'x': 3.99,
-									'y': -7.38,
-								},
-								{
-									'x': 0.59,
-									'y': 4.27,
-								},
-								{
-									'x': -7.03,
-									'y': 2.08,
-								},
+			expectedGeometry: &gogis.MultiPolygon{
+				gogis.Polygon{
+					gogis.LineString{
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': -7.03,
+								'y': 2.08,
 							},
-							{
-								{
-									'x': 9.37,
-									'y': 54.44,
-								},
-								{
-									'x': 86.33,
-									'y': -31.49,
-								},
-								{
-									'x': 38.34,
-									'y': -92.61,
-								},
-								{
-									'x': 9.37,
-									'y': 54.44,
-								},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 3.99,
+								'y': -7.38,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 0.59,
+								'y': 4.27,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': -7.03,
+								'y': 2.08,
 							},
 						},
 					},
-					{
-						CoordinateGroup: ewkb.CoordinateGroup{
-							{
-								{
-									'x': -17.03,
-									'y': 12.08,
-								},
-								{
-									'x': 13.99,
-									'y': -17.38,
-								},
-								{
-									'x': 10.59,
-									'y': 14.27,
-								},
-								{
-									'x': -17.03,
-									'y': 12.08,
-								},
+					gogis.LineString{
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 9.37,
+								'y': 54.44,
 							},
-							{
-								{
-									'x': 19.37,
-									'y': 154.44,
-								},
-								{
-									'x': 186.33,
-									'y': -131.49,
-								},
-								{
-									'x': 138.34,
-									'y': -192.61,
-								},
-								{
-									'x': 19.37,
-									'y': 154.44,
-								},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 86.33,
+								'y': -31.49,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 38.34,
+								'y': -92.61,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 9.37,
+								'y': 54.44,
+							},
+						},
+					},
+				},
+				gogis.Polygon{
+					gogis.LineString{
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': -17.03,
+								'y': 12.08,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 13.99,
+								'y': -17.38,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 10.59,
+								'y': 14.27,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': -17.03,
+								'y': 12.08,
+							},
+						},
+					},
+					gogis.LineString{
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 19.37,
+								'y': 154.44,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 186.33,
+								'y': -131.49,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 138.34,
+								'y': -192.61,
+							},
+						},
+						gogis.Point{
+							Coordinate: ewkb.Coordinate{
+								'x': 19.37,
+								'y': 154.44,
 							},
 						},
 					},
@@ -298,27 +338,33 @@ func TestGeometryScan(t *testing.T) {
 			title:                "triangle",
 			rawData:              []byte("01110000C001000000040000007B14AE47E1DA51C07B14AE47E15A454000000000000010400000000000001440EC51B81E856B31C0F6285C8FC215454000000000000010400000000000001440EC51B81E856B31C07B14AE47E1CA5140000000000000104000000000000014407B14AE47E1DA51C07B14AE47E15A454000000000000010400000000000001440"),
 			expectedGeometryType: ewkb.GeometryTypeTriangle,
-			expectedGeometry: &ewkb.Triangle{
-				CoordinateSet: ewkb.CoordinateSet{
-					{
+			expectedGeometry: &gogis.Triangle{
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': -71.42,
 						'y': 42.71,
 						'z': 4,
 						'm': 5,
 					},
-					{
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': -17.42,
 						'y': 42.17,
 						'z': 4,
 						'm': 5,
 					},
-					{
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': -17.42,
 						'y': 71.17,
 						'z': 4,
 						'm': 5,
 					},
-					{
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': -71.42,
 						'y': 42.71,
 						'z': 4,
@@ -331,21 +377,25 @@ func TestGeometryScan(t *testing.T) {
 			title:                "circularstring",
 			rawData:              []byte("01080000C0030000003CDBA337DCC351C06D37C1374D37484000000000000024400000000000003E40000000000000144000000000000018400000000000001C400000000000002040000000000000F03F000000000000004000000000000008400000000000001040"),
 			expectedGeometryType: ewkb.GeometryTypeCircularString,
-			expectedGeometry: &ewkb.CircularString{
-				CoordinateSet: []ewkb.Coordinate{
-					{
+			expectedGeometry: &gogis.CircularString{
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': -71.060316,
 						'y': 48.432044,
 						'z': 10,
 						'm': 30,
 					},
-					{
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': 5,
 						'y': 6,
 						'z': 7,
 						'm': 8,
 					},
-					{
+				},
+				gogis.Point{
+					Coordinate: ewkb.Coordinate{
 						'x': 1,
 						'y': 2,
 						'z': 3,
@@ -441,8 +491,6 @@ func Example_scanAny() { //nolint: wsl,nosnakecase,testableexamples
 
 	// Read data.
 	for rows.Next() {
-		// Here you can inject your own type:
-		// geometry := gogis.NewFeometry(gogis.WithWellKnownGeometry(&myCustom1{}, &myCustom2{}))
 		geometry := gogis.NewGeometry()
 
 		err = rows.Scan(geometry)
@@ -451,28 +499,21 @@ func Example_scanAny() { //nolint: wsl,nosnakecase,testableexamples
 		}
 
 		switch data := geometry.Geometry.(type) {
-		case *ewkb.Point:
+		case *gogis.Point:
 			// process point
 			fmt.Printf("* point %+v\n", data)
 
-		case *ewkb.LineString:
+		case *gogis.LineString:
 			// process linestring
 			fmt.Printf("* linestring %+v\n", data)
 
-		case *ewkb.Polygon:
+		case *gogis.Polygon:
 			// process polygon
 			fmt.Printf("* polygon %+v\n", data)
 
-		case *ewkb.MultiPoint:
+		case *gogis.MultiPoint:
 			// process multipoint
 			fmt.Printf("* multipoint %+v\n", data)
-
-		default:
-			// If you have your custom types, just add:
-			// case *myCustom1:
-			// process myCustom1
-			// case *myCustom2:
-			// process myCustom2
-		} //nolint: wsl
+		}
 	}
 }

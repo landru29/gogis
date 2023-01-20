@@ -37,10 +37,9 @@ func (p *NullPoint) Scan(value interface{}) error {
 		return err
 	}
 
-	p.Point = PointFromEWKB(point)
-	p.Valid = !p.Point.Coordinate.IsNull()
+	p.Valid = !point.Coordinate.IsNull()
 
-	return nil
+	return (&p.Point).FromEWKB(point)
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -50,14 +49,12 @@ func (p *Point) Scan(value interface{}) error {
 		return err
 	}
 
-	*p = PointFromEWKB(point)
-
-	return nil
+	return p.FromEWKB(point)
 }
 
 // Value implements the driver Valuer interface.
 func (p Point) Value() (driver.Value, error) {
-	return ewkb.Marshal(ewkb.Point(p))
+	return ewkb.Marshal(p.ToEWKB())
 }
 
 // Value implements the driver Valuer interface.
@@ -69,7 +66,19 @@ func (p NullPoint) Value() (driver.Value, error) {
 	return p.Point.Value()
 }
 
-// PointFromEWKB converts EWKB to Point.
-func PointFromEWKB(pnt ewkb.Point) Point {
-	return Point(pnt)
+// FromEWKB implements the ModelConverter interface.
+func (p *Point) FromEWKB(from interface{}) error {
+	pnt, ok := fromPtr(from).(ewkb.Point)
+	if !ok {
+		return ewkb.ErrWrongGeometryType
+	}
+
+	*p = Point(pnt)
+
+	return nil
+}
+
+// ToEWKB implements the ModelConverter interface.
+func (p Point) ToEWKB() ewkb.Geometry { //nolint: ireturn
+	return (*ewkb.Point)(&p)
 }
