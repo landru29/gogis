@@ -56,7 +56,7 @@ func (l *LineString) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (l LineString) Value() (driver.Value, error) {
-	return ewkb.Marshal(linestringToEWKB(l))
+	return ewkb.Marshal(l.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -70,7 +70,7 @@ func (l NullLineString) Value() (driver.Value, error) {
 
 // FromEWKB implements the ModelConverter interface.
 func (l *LineString) FromEWKB(from interface{}) error {
-	linestring, ok := from.(ewkb.LineString)
+	linestring, ok := fromPtr(from).(ewkb.LineString)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}
@@ -86,16 +86,17 @@ func (l *LineString) FromEWKB(from interface{}) error {
 	return nil
 }
 
-func linestringToEWKB(line LineString) ewkb.LineString {
+// ToEWKB implements the ModelConverter interface.
+func (l LineString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 	linestring := ewkb.LineString{
-		CoordinateSet: make(ewkb.CoordinateSet, len(line)),
+		CoordinateSet: make(ewkb.CoordinateSet, len(l)),
 	}
 
-	if len(line) > 0 {
-		linestring.SRID = line[0].SRID
+	if len(l) > 0 {
+		linestring.SRID = l[0].SRID
 	}
 
-	for idx, pnt := range line {
+	for idx, pnt := range l {
 		linestring.CoordinateSet[idx] = pnt.Coordinate
 	}
 

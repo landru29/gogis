@@ -73,7 +73,7 @@ func (p Polygon) Value() (driver.Value, error) {
 
 	polygon.SRID = srid
 
-	return ewkb.Marshal(polygonToEWKB(p))
+	return ewkb.Marshal(p.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -87,7 +87,7 @@ func (p NullPolygon) Value() (driver.Value, error) {
 
 // FromEWKB implements the ModelConverter interface.
 func (p *Polygon) FromEWKB(from interface{}) error {
-	polygon, ok := from.(ewkb.Polygon)
+	polygon, ok := fromPtr(from).(ewkb.Polygon)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}
@@ -108,14 +108,15 @@ func (p *Polygon) FromEWKB(from interface{}) error {
 	return nil
 }
 
-func polygonToEWKB(poly Polygon) ewkb.Polygon {
+// ToEWKB implements the ModelConverter interface.
+func (p Polygon) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 	var srid *ewkb.SystemReferenceID
 
 	polygon := ewkb.Polygon{
-		CoordinateGroup: make(ewkb.CoordinateGroup, len(poly)),
+		CoordinateGroup: make(ewkb.CoordinateGroup, len(p)),
 	}
 
-	for idx0, ring := range poly {
+	for idx0, ring := range p {
 		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
 
 		for idx1, pnt := range ring {

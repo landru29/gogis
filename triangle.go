@@ -56,19 +56,7 @@ func (t *Triangle) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (t Triangle) Value() (driver.Value, error) {
-	var srid *ewkb.SystemReferenceID
-
-	triangle := ewkb.Triangle{
-		CoordinateSet: make(ewkb.CoordinateSet, len(t)),
-	}
-
-	for idx, pnt := range t {
-		triangle.CoordinateSet[idx] = pnt.Coordinate
-	}
-
-	triangle.SRID = srid
-
-	return ewkb.Marshal(triangle)
+	return ewkb.Marshal(t.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -82,7 +70,7 @@ func (t NullTriangle) Value() (driver.Value, error) {
 
 // FromEWKB implements the ModelConverter interface.
 func (t *Triangle) FromEWKB(from interface{}) error {
-	triangle, ok := from.(ewkb.Triangle)
+	triangle, ok := fromPtr(from).(ewkb.Triangle)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}
@@ -96,4 +84,22 @@ func (t *Triangle) FromEWKB(from interface{}) error {
 	*t = Triangle(poly)
 
 	return nil
+}
+
+// ToEWKB implements the ModelConverter interface.
+func (t Triangle) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+	var srid *ewkb.SystemReferenceID
+
+	triangle := ewkb.Triangle{
+		CoordinateSet: make(ewkb.CoordinateSet, len(t)),
+	}
+
+	for idx, pnt := range t {
+		triangle.CoordinateSet[idx] = pnt.Coordinate
+		srid = pnt.SRID
+	}
+
+	triangle.SRID = srid
+
+	return triangle
 }

@@ -56,6 +56,20 @@ func (c *CircularString) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (c CircularString) Value() (driver.Value, error) {
+	return ewkb.Marshal(c.ToEWKB())
+}
+
+// Value implements the driver.Valuer interface.
+func (c NullCircularString) Value() (driver.Value, error) {
+	if !c.Valid {
+		return nil, nil
+	}
+
+	return c.CircularString.Value()
+}
+
+// ToEWKB implements the ModelConverter interface.
+func (c CircularString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 	var srid *ewkb.SystemReferenceID
 
 	circle := ewkb.CircularString{
@@ -68,21 +82,12 @@ func (c CircularString) Value() (driver.Value, error) {
 
 	circle.SRID = srid
 
-	return ewkb.Marshal(circle)
-}
-
-// Value implements the driver.Valuer interface.
-func (c NullCircularString) Value() (driver.Value, error) {
-	if !c.Valid {
-		return nil, nil
-	}
-
-	return c.CircularString.Value()
+	return circle
 }
 
 // FromEWKB implements the ModelConverter interface.
 func (c *CircularString) FromEWKB(from interface{}) error {
-	circular, ok := from.(ewkb.CircularString)
+	circular, ok := fromPtr(from).(ewkb.CircularString)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}

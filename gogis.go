@@ -103,7 +103,23 @@
 //		}
 package gogis
 
+import (
+	"reflect"
+
+	"github.com/landru29/gogis/ewkb"
+)
+
 // ModelConverter is the converter from EWKB to Model.
 type ModelConverter interface {
 	FromEWKB(geometry interface{}) error
+	ToEWKB() ewkb.Marshaler
+}
+
+func fromPtr(data interface{}) interface{} {
+	typeOf := reflect.ValueOf(data)
+	if typeOf.Kind() == reflect.Pointer {
+		return typeOf.Elem().Interface()
+	}
+
+	return data
 }

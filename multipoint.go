@@ -56,6 +56,20 @@ func (m *MultiPoint) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (m MultiPoint) Value() (driver.Value, error) {
+	return ewkb.Marshal(m.ToEWKB())
+}
+
+// Value implements the driver.Valuer interface.
+func (m NullMultiPoint) Value() (driver.Value, error) {
+	if !m.Valid {
+		return nil, nil
+	}
+
+	return m.MultiPoint.Value()
+}
+
+// ToEWKB implements the ModelConverter interface.
+func (m MultiPoint) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 	multi := ewkb.MultiPoint{
 		Points: make([]ewkb.Point, len(m)),
 	}
@@ -68,21 +82,12 @@ func (m MultiPoint) Value() (driver.Value, error) {
 		multi.Points[idx] = ewkb.Point(pnt)
 	}
 
-	return ewkb.Marshal(multi)
-}
-
-// Value implements the driver.Valuer interface.
-func (m NullMultiPoint) Value() (driver.Value, error) {
-	if !m.Valid {
-		return nil, nil
-	}
-
-	return m.MultiPoint.Value()
+	return multi
 }
 
 // FromEWKB implements the ModelConverter interface.
 func (m *MultiPoint) FromEWKB(from interface{}) error {
-	multi, ok := from.(ewkb.MultiPoint)
+	multi, ok := fromPtr(from).(ewkb.MultiPoint)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}

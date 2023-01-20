@@ -54,7 +54,7 @@ func (p *Point) Scan(value interface{}) error {
 
 // Value implements the driver Valuer interface.
 func (p Point) Value() (driver.Value, error) {
-	return ewkb.Marshal(ewkb.Point(p))
+	return ewkb.Marshal(p.ToEWKB())
 }
 
 // Value implements the driver Valuer interface.
@@ -68,7 +68,7 @@ func (p NullPoint) Value() (driver.Value, error) {
 
 // FromEWKB implements the ModelConverter interface.
 func (p *Point) FromEWKB(from interface{}) error {
-	pnt, ok := from.(ewkb.Point)
+	pnt, ok := fromPtr(from).(ewkb.Point)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}
@@ -76,4 +76,9 @@ func (p *Point) FromEWKB(from interface{}) error {
 	*p = Point(pnt)
 
 	return nil
+}
+
+// ToEWKB implements the ModelConverter interface.
+func (p Point) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+	return ewkb.Point(p)
 }

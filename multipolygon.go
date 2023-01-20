@@ -56,19 +56,7 @@ func (p *MultiPolygon) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (p MultiPolygon) Value() (driver.Value, error) {
-	multi := ewkb.MultiPolygon{
-		Polygons: make([]ewkb.Polygon, len(p)),
-	}
-
-	if len(p) > 0 {
-		multi.SRID = p.srid()
-	}
-
-	for idx, poly := range p {
-		multi.Polygons[idx] = polygonToEWKB(poly)
-	}
-
-	return ewkb.Marshal(multi)
+	return ewkb.Marshal(p.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -92,9 +80,26 @@ func (p MultiPolygon) srid() *ewkb.SystemReferenceID {
 	return nil
 }
 
+// ToEWKB implements the ModelConverter interface.
+func (p MultiPolygon) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+	multi := ewkb.MultiPolygon{
+		Polygons: make([]ewkb.Polygon, len(p)),
+	}
+
+	if len(p) > 0 {
+		multi.SRID = p.srid()
+	}
+
+	for idx, poly := range p {
+		multi.Polygons[idx], _ = poly.ToEWKB().(ewkb.Polygon)
+	}
+
+	return multi
+}
+
 // FromEWKB implements the ModelConverter interface.
 func (p *MultiPolygon) FromEWKB(from interface{}) error {
-	multi, ok := from.(ewkb.MultiPolygon)
+	multi, ok := fromPtr(from).(ewkb.MultiPolygon)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}

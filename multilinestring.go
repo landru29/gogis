@@ -56,19 +56,7 @@ func (m *MultiLineString) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (m MultiLineString) Value() (driver.Value, error) {
-	multi := ewkb.MultiLineString{
-		LineStrings: make([]ewkb.LineString, len(m)),
-	}
-
-	if len(m) > 0 {
-		multi.SRID = m.srid()
-	}
-
-	for idx, poly := range m {
-		multi.LineStrings[idx] = linestringToEWKB(poly)
-	}
-
-	return ewkb.Marshal(multi)
+	return ewkb.Marshal(m.ToEWKB())
 }
 
 // Value implements the driver.Valuer interface.
@@ -90,9 +78,26 @@ func (m MultiLineString) srid() *ewkb.SystemReferenceID {
 	return nil
 }
 
+// ToEWKB implements the ModelConverter interface.
+func (m MultiLineString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+	multi := ewkb.MultiLineString{
+		LineStrings: make([]ewkb.LineString, len(m)),
+	}
+
+	if len(m) > 0 {
+		multi.SRID = m.srid()
+	}
+
+	for idx, poly := range m {
+		multi.LineStrings[idx], _ = poly.ToEWKB().(ewkb.LineString)
+	}
+
+	return multi
+}
+
 // FromEWKB implements the ModelConverter interface.
 func (m *MultiLineString) FromEWKB(from interface{}) error {
-	multi, ok := from.(ewkb.MultiLineString)
+	multi, ok := fromPtr(from).(ewkb.MultiLineString)
 	if !ok {
 		return ewkb.ErrWrongGeometryType
 	}
