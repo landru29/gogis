@@ -69,7 +69,7 @@ func (m NullMultiPoint) Value() (driver.Value, error) {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (m MultiPoint) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+func (m MultiPoint) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	multi := ewkb.MultiPoint{
 		Points: make([]ewkb.Point, len(m)),
 	}
@@ -82,7 +82,7 @@ func (m MultiPoint) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 		multi.Points[idx] = ewkb.Point(pnt)
 	}
 
-	return multi
+	return &multi
 }
 
 // FromEWKB implements the ModelConverter interface.

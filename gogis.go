@@ -115,7 +115,7 @@ type ModelConverter interface {
 	FromEWKB(geometry interface{}) error
 
 	// ToEWKB converts model to EWKB.
-	ToEWKB() ewkb.Marshaler
+	ToEWKB() ewkb.Geometry
 }
 
 func fromPtr(data interface{}) interface{} {

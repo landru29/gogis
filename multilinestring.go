@@ -79,20 +79,19 @@ func (m MultiLineString) srid() *ewkb.SystemReferenceID {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (m MultiLineString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+func (m MultiLineString) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	multi := ewkb.MultiLineString{
 		LineStrings: make([]ewkb.LineString, len(m)),
 	}
 
-	if len(m) > 0 {
-		multi.SRID = m.srid()
-	}
+	multi.SRID = m.srid()
 
 	for idx, poly := range m {
-		multi.LineStrings[idx], _ = poly.ToEWKB().(ewkb.LineString)
+		multiline, _ := poly.ToEWKB().(*ewkb.LineString)
+		multi.LineStrings[idx] = *multiline
 	}
 
-	return multi
+	return &multi
 }
 
 // FromEWKB implements the ModelConverter interface.

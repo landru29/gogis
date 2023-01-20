@@ -109,7 +109,7 @@ func (p *Polygon) FromEWKB(from interface{}) error {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (p Polygon) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+func (p Polygon) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	var srid *ewkb.SystemReferenceID
 
 	polygon := ewkb.Polygon{
@@ -127,5 +127,5 @@ func (p Polygon) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 
 	polygon.SRID = srid
 
-	return polygon
+	return &polygon
 }

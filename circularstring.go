@@ -69,7 +69,7 @@ func (c NullCircularString) Value() (driver.Value, error) {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (c CircularString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+func (c CircularString) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	var srid *ewkb.SystemReferenceID
 
 	circle := ewkb.CircularString{
@@ -82,7 +82,7 @@ func (c CircularString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 
 	circle.SRID = srid
 
-	return circle
+	return &circle
 }
 
 // FromEWKB implements the ModelConverter interface.

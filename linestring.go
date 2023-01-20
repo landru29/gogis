@@ -87,7 +87,7 @@ func (l *LineString) FromEWKB(from interface{}) error {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (l LineString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+func (l LineString) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	linestring := ewkb.LineString{
 		CoordinateSet: make(ewkb.CoordinateSet, len(l)),
 	}
@@ -100,5 +100,5 @@ func (l LineString) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 		linestring.CoordinateSet[idx] = pnt.Coordinate
 	}
 
-	return linestring
+	return &linestring
 }

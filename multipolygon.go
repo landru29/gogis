@@ -81,7 +81,7 @@ func (p MultiPolygon) srid() *ewkb.SystemReferenceID {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (p MultiPolygon) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+func (p MultiPolygon) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	multi := ewkb.MultiPolygon{
 		Polygons: make([]ewkb.Polygon, len(p)),
 	}
@@ -91,10 +91,11 @@ func (p MultiPolygon) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 	}
 
 	for idx, poly := range p {
-		multi.Polygons[idx], _ = poly.ToEWKB().(ewkb.Polygon)
+		polygon, _ := poly.ToEWKB().(*ewkb.Polygon)
+		multi.Polygons[idx] = *polygon
 	}
 
-	return multi
+	return &multi
 }
 
 // FromEWKB implements the ModelConverter interface.

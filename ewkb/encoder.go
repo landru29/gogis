@@ -17,8 +17,9 @@ func Marshal(geoShape Marshaler) ([]byte, error) {
 
 // Encoder is a Extended Well Known Byte encoder.
 type Encoder struct {
-	writer    io.Writer
-	byteOrder binary.ByteOrder
+	writer     io.Writer
+	byteOrder  binary.ByteOrder
+	ignoreSRID bool
 }
 
 // NewEncoder creates a EWKB encoder.
@@ -41,7 +42,7 @@ func (e *Encoder) Encode(geoShape Marshaler) error {
 	withSRID := uint32(0)
 
 	srid := geoShape.SystemReferenceID()
-	if srid != nil {
+	if srid != nil && !e.ignoreSRID {
 		sridBytes := make([]byte, size32bit)
 
 		e.byteOrder.PutUint32(sridBytes, uint32(*srid))

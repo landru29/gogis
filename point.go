@@ -79,6 +79,6 @@ func (p *Point) FromEWKB(from interface{}) error {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (p Point) ToEWKB() ewkb.Marshaler { //nolint: ireturn
-	return ewkb.Point(p)
+func (p Point) ToEWKB() ewkb.Geometry { //nolint: ireturn
+	return (*ewkb.Point)(&p)
 }

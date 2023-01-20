@@ -15,54 +15,22 @@ type Geometry struct {
 	Geometry interface{}
 	Valid    bool
 
-	wellknown []Binding
-}
-
-// Binding is a type binding.
-type Binding struct {
-	ewkbType  ewkb.Geometry
-	modelType ModelConverter
-}
-
-// Bind creates a binding.
-func Bind(ewkbType ewkb.Geometry, modelType ModelConverter) Binding {
-	return Binding{
-		ewkbType:  ewkbType,
-		modelType: modelType,
-	}
+	wellknown BindSet
 }
 
 // NewGeometry creates a new Geometry.
-func NewGeometry(opts ...func(*Geometry)) *Geometry {
-	output := &Geometry{
-		wellknown: []Binding{
-			Bind(&ewkb.Point{}, &Point{}),
-			Bind(&ewkb.LineString{}, &LineString{}),
-			Bind(&ewkb.Polygon{}, &Polygon{}),
-			Bind(&ewkb.MultiPoint{}, &MultiPoint{}),
-			Bind(&ewkb.MultiLineString{}, &MultiLineString{}),
-			Bind(&ewkb.MultiPolygon{}, &MultiPolygon{}),
-			Bind(&ewkb.Triangle{}, &Triangle{}),
-			Bind(&ewkb.CircularString{}, &CircularString{}),
-		},
-	}
+func NewGeometry(opts ...func(interface{})) *Geometry {
+	output := &Geometry{}
 
 	for _, opt := range opts {
 		opt(output)
 	}
 
-	return output
-}
-
-// WithWellKnownGeometry add custom Geometry to the wellknown.
-func WithWellKnownGeometry(binding ...Binding) func(*Geometry) {
-	return func(shape *Geometry) {
-		wellknown := []Binding{}
-		wellknown = append(wellknown, binding...)
-		wellknown = append(wellknown, shape.wellknown...)
-
-		shape.wellknown = wellknown
+	if len(opts) == 0 {
+		output.wellknown = DefaultWellKnownBinding()
 	}
+
+	return output
 }
 
 // Scan implements the SQL driver.Scanner interface.
@@ -108,7 +76,7 @@ func (g *Geometry) Scan(value interface{}) error {
 
 // Value implements the driver Valuer interface.
 func (g *Geometry) Value() (driver.Value, error) {
-	if !g.Valid {
+	if !g.Valid || g.Geometry == nil {
 		return nil, nil
 	}
 

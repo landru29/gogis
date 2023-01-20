@@ -38,12 +38,9 @@ func (g GeometryCollection) pick(geoType GeometryType) (Geometry, error) { //nol
 	return nil, ErrWrongGeometryType
 }
 
-// NewGeometryCollection creates a new empty collection of geometries.
-func NewGeometryCollection(wellknownGeometry ...Geometry) *GeometryCollection {
-	wellknown := []Geometry{}
-	wellknown = append(wellknown, wellknownGeometry...)
-	wellknown = append(
-		wellknown,
+// DefaultWellKnownGeometry is the default well known geometry set.
+func DefaultWellKnownGeometry() []Geometry {
+	return []Geometry{
 		&Point{},
 		&LineString{},
 		&Polygon{},
@@ -52,9 +49,17 @@ func NewGeometryCollection(wellknownGeometry ...Geometry) *GeometryCollection {
 		&MultiPolygon{},
 		&Triangle{},
 		&CircularString{},
-	)
+		&GeometryCollection{},
+	}
+}
 
-	return &GeometryCollection{wellKnownGeometry: wellknown}
+// NewGeometryCollection creates a new empty collection of geometries.
+func NewGeometryCollection(wellknownGeometry ...Geometry) *GeometryCollection {
+	if len(wellknownGeometry) == 0 {
+		return &GeometryCollection{wellKnownGeometry: DefaultWellKnownGeometry()}
+	}
+
+	return &GeometryCollection{wellKnownGeometry: wellknownGeometry}
 }
 
 // Type implements the Geometry interface.
@@ -112,7 +117,7 @@ func (g GeometryCollection) MarshalEWBK(byteOrder binary.ByteOrder) ([]byte, err
 	buffer := bytes.NewBuffer(nil)
 
 	for _, geo := range g.Collection {
-		if err := (&Encoder{writer: buffer, byteOrder: byteOrder}).Encode(geo); err != nil {
+		if err := (&Encoder{writer: buffer, byteOrder: byteOrder, ignoreSRID: true}).Encode(geo); err != nil {
 			return nil, err
 		}
 	}

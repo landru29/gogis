@@ -87,7 +87,7 @@ func (t *Triangle) FromEWKB(from interface{}) error {
 }
 
 // ToEWKB implements the ModelConverter interface.
-func (t Triangle) ToEWKB() ewkb.Marshaler { //nolint: ireturn
+func (t Triangle) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	var srid *ewkb.SystemReferenceID
 
 	triangle := ewkb.Triangle{
@@ -101,5 +101,5 @@ func (t Triangle) ToEWKB() ewkb.Marshaler { //nolint: ireturn
 
 	triangle.SRID = srid
 
-	return triangle
+	return &triangle
 }
