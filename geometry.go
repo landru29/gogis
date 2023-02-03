@@ -8,6 +8,14 @@ import (
 	"github.com/landru29/gogis/ewkb"
 )
 
+var globalWellknownBindings = DefaultWellKnownBinding() //nolint: gochecknoglobals
+
+// AppendWellKnownBinding add new binding to the globazl list.
+func AppendWellKnownBinding(binding Binding) {
+	out := append([]Binding{}, binding)
+	globalWellknownBindings = append(out, globalWellknownBindings...)
+}
+
 // Geometry is any PostGIS geometry.
 // This is used when user doesn't know which geometry to retrieve from database.
 type Geometry struct {
@@ -24,10 +32,6 @@ func NewGeometry(opts ...func(interface{})) *Geometry {
 
 	for _, opt := range opts {
 		opt(output)
-	}
-
-	if len(opts) == 0 {
-		output.wellknown = DefaultWellKnownBinding()
 	}
 
 	return output
@@ -59,7 +63,13 @@ func (g *Geometry) Scan(value interface{}) error {
 
 	g.Type = record.Type
 
-	for _, bind := range g.wellknown {
+	wellknown := g.wellknown
+
+	if len(wellknown) == 0 {
+		wellknown = globalWellknownBindings
+	}
+
+	for _, bind := range wellknown {
 		if bind.ewkbType.Type() == record.Type {
 			if err := bind.ewkbType.UnmarshalEWBK(*record); err != nil {
 				return err
@@ -67,7 +77,12 @@ func (g *Geometry) Scan(value interface{}) error {
 
 			g.Geometry = bind.modelType
 
-			return bind.modelType.FromEWKB(bind.ewkbType)
+			err := bind.modelType.FromEWKB(bind.ewkbType)
+			if err == nil {
+				g.Valid = true
+			}
+
+			return err
 		}
 	}
 

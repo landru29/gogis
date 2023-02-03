@@ -103,3 +103,18 @@ func (t Triangle) ToEWKB() ewkb.Geometry { //nolint: ireturn
 
 	return &triangle
 }
+
+// Geometry converts to a generic geometry.
+func (t Triangle) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypeTriangle,
+		Geometry: &t,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
+}

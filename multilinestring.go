@@ -113,3 +113,18 @@ func (m *MultiLineString) FromEWKB(from interface{}) error {
 
 	return nil
 }
+
+// Geometry converts to a generic geometry.
+func (m MultiLineString) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypeMultiLineString,
+		Geometry: &m,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
+}

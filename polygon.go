@@ -129,3 +129,18 @@ func (p Polygon) ToEWKB() ewkb.Geometry { //nolint: ireturn
 
 	return &polygon
 }
+
+// Geometry converts to a generic geometry.
+func (p Polygon) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypePolygon,
+		Geometry: &p,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
+}

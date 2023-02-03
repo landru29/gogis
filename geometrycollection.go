@@ -23,10 +23,6 @@ func NewGeometryCollection(opts ...func(interface{})) *GeometryCollection {
 		opt(output)
 	}
 
-	if len(opts) == 0 {
-		output.wellknown = DefaultWellKnownBinding()
-	}
-
 	return output
 }
 
@@ -58,8 +54,14 @@ func (g *GeometryCollection) Scan(value interface{}) error {
 		return nil
 	}
 
-	wellKnown := make([]ewkb.Geometry, len(g.wellknown))
-	for idx, binding := range g.wellknown {
+	wellknownB := g.wellknown
+
+	if len(wellknownB) == 0 {
+		wellknownB = globalWellknownBindings
+	}
+
+	wellKnown := make([]ewkb.Geometry, len(wellknownB))
+	for idx, binding := range wellknownB {
 		wellKnown[idx] = binding.ewkbType
 	}
 
@@ -124,4 +126,19 @@ func (g GeometryCollection) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	}
 
 	return collection
+}
+
+// Geometry converts to a generic geometry.
+func (g GeometryCollection) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypeGeometryCollection,
+		Geometry: &g,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
 }
