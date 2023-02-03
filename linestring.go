@@ -79,6 +79,7 @@ func (l *LineString) FromEWKB(from interface{}) error {
 
 	for idx, pnt := range linestring.CoordinateSet {
 		pointSet[idx].Coordinate = pnt
+		pointSet[idx].SRID = linestring.SRID
 	}
 
 	*l = LineString(pointSet)
@@ -101,4 +102,19 @@ func (l LineString) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	}
 
 	return &linestring
+}
+
+// Geometry converts to a generic geometry.
+func (l LineString) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypeLineString,
+		Geometry: &l,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
 }

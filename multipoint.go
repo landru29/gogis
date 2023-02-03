@@ -102,3 +102,18 @@ func (m *MultiPoint) FromEWKB(from interface{}) error {
 
 	return nil
 }
+
+// Geometry converts to a generic geometry.
+func (m MultiPoint) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypeMultiPoint,
+		Geometry: &m,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
+}

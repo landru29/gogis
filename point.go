@@ -82,3 +82,18 @@ func (p *Point) FromEWKB(from interface{}) error {
 func (p Point) ToEWKB() ewkb.Geometry { //nolint: ireturn
 	return (*ewkb.Point)(&p)
 }
+
+// Geometry converts to a generic geometry.
+func (p Point) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypePoint,
+		Geometry: &p,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
+}

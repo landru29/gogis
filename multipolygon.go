@@ -117,3 +117,18 @@ func (p *MultiPolygon) FromEWKB(from interface{}) error {
 
 	return nil
 }
+
+// Geometry converts to a generic geometry.
+func (p MultiPolygon) Geometry(opts ...func(interface{})) Geometry {
+	output := Geometry{
+		Type:     ewkb.GeometryTypeMultiPolygon,
+		Geometry: &p,
+		Valid:    true,
+	}
+
+	for _, opt := range opts {
+		opt(&output)
+	}
+
+	return output
+}
