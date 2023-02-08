@@ -79,6 +79,7 @@ func (t *Triangle) FromEWKB(from interface{}) error {
 
 	for idx, pnt := range triangle.CoordinateSet {
 		poly[idx].Coordinate = pnt
+		poly[idx].SRID = triangle.SRID
 	}
 
 	*t = Triangle(poly)

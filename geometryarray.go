@@ -70,8 +70,10 @@ func (g GeometryArray) Value() (driver.Value, error) {
 		val, _ := drvValue.([]byte)
 
 		if idx == 0 {
-			ewkbData[idx] = append([]byte("{"), val...)
+			ewkbData[idx] = []byte("{")
 		}
+
+		ewkbData[idx] = append(ewkbData[idx], val...)
 
 		if idx == len(g)-1 {
 			ewkbData[idx] = append(val, '}')
