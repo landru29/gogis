@@ -56,7 +56,12 @@ func (l *LineString) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (l LineString) Value() (driver.Value, error) {
-	return ewkb.Marshal(l.ToEWKB())
+	output, err := ewkb.Marshal(l.ToEWKB())
+	if err != nil {
+		return nil, err
+	}
+
+	return string(output), nil
 }
 
 // Value implements the driver.Valuer interface.

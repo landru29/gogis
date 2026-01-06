@@ -56,7 +56,12 @@ func (t *Triangle) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (t Triangle) Value() (driver.Value, error) {
-	return ewkb.Marshal(t.ToEWKB())
+	output, err := ewkb.Marshal(t.ToEWKB())
+	if err != nil {
+		return nil, err
+	}
+
+	return string(output), nil
 }
 
 // Value implements the driver.Valuer interface.

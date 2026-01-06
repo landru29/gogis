@@ -80,7 +80,12 @@ func (g GeometryCollection) Value() (driver.Value, error) {
 		return nil, nil
 	}
 
-	return ewkb.Marshal(g.ToEWKB())
+	output, err := ewkb.Marshal(g.ToEWKB())
+	if err != nil {
+		return nil, err
+	}
+
+	return string(output), nil
 }
 
 // FromEWKB implements the ModelConverter interface.

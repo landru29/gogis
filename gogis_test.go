@@ -78,8 +78,8 @@ func valueTest(t *testing.T, fixture testFixtureValue) {
 		return
 	}
 
-	dataByte, ok := out.([]byte)
-	require.True(t, ok, "should be []byte output")
+	dataByte, ok := out.(string)
+	require.True(t, ok, "should be string output")
 
 	assert.Equal(t, strings.ToUpper(string(fixture.expectedRawData)), strings.ToUpper(string(dataByte)))
 }

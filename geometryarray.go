@@ -3,6 +3,7 @@ package gogis
 import (
 	"bytes"
 	"database/sql/driver"
+	"strings"
 
 	"github.com/landru29/gogis/ewkb"
 )
@@ -59,7 +60,7 @@ func (g GeometryArray) Value() (driver.Value, error) {
 		return nil, nil
 	}
 
-	ewkbData := make([][]byte, len(g))
+	ewkbData := make([]string, len(g))
 
 	for idx, geo := range g {
 		drvValue, err := geo.Value()
@@ -67,18 +68,18 @@ func (g GeometryArray) Value() (driver.Value, error) {
 			return nil, err
 		}
 
-		val, _ := drvValue.([]byte)
+		val, _ := drvValue.(string)
 
 		if idx == 0 {
-			ewkbData[idx] = []byte("{")
+			ewkbData[idx] = "{"
 		}
 
-		ewkbData[idx] = append(ewkbData[idx], val...)
+		ewkbData[idx] = ewkbData[idx] + val
 
 		if idx == len(g)-1 {
-			ewkbData[idx] = append(val, '}')
+			ewkbData[idx] = ewkbData[idx] + "}"
 		}
 	}
 
-	return bytes.Join(ewkbData, []byte(":")), nil
+	return string(strings.Join(ewkbData, ":")), nil
 }

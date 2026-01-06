@@ -56,7 +56,12 @@ func (c *CircularString) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (c CircularString) Value() (driver.Value, error) {
-	return ewkb.Marshal(c.ToEWKB())
+	output, err := ewkb.Marshal(c.ToEWKB())
+	if err != nil {
+		return nil, err
+	}
+
+	return string(output), nil
 }
 
 // Value implements the driver.Valuer interface.

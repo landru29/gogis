@@ -56,7 +56,12 @@ func (m *MultiLineString) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (m MultiLineString) Value() (driver.Value, error) {
-	return ewkb.Marshal(m.ToEWKB())
+	output, err := ewkb.Marshal(m.ToEWKB())
+	if err != nil {
+		return nil, err
+	}
+
+	return string(output), nil
 }
 
 // Value implements the driver.Valuer interface.

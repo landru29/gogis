@@ -54,7 +54,12 @@ func (p *Point) Scan(value interface{}) error {
 
 // Value implements the driver Valuer interface.
 func (p Point) Value() (driver.Value, error) {
-	return ewkb.Marshal(p.ToEWKB())
+	output, err := ewkb.Marshal(p.ToEWKB())
+	if err != nil {
+		return nil, err
+	}
+
+	return string(output), nil
 }
 
 // Value implements the driver Valuer interface.

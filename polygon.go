@@ -56,24 +56,12 @@ func (p *Polygon) Scan(value interface{}) error {
 
 // Value implements the driver.Valuer interface.
 func (p Polygon) Value() (driver.Value, error) {
-	var srid *ewkb.SystemReferenceID
-
-	polygon := ewkb.Polygon{
-		CoordinateGroup: make(ewkb.CoordinateGroup, len(p)),
+	output, err := ewkb.Marshal(p.ToEWKB())
+	if err != nil {
+		return nil, err
 	}
 
-	for idx0, ring := range p {
-		polygon.CoordinateGroup[idx0] = make(ewkb.CoordinateSet, len(ring))
-
-		for idx1, pnt := range ring {
-			srid = pnt.SRID
-			polygon.CoordinateGroup[idx0][idx1] = pnt.Coordinate
-		}
-	}
-
-	polygon.SRID = srid
-
-	return ewkb.Marshal(p.ToEWKB())
+	return string(output), nil
 }
 
 // Value implements the driver.Valuer interface.

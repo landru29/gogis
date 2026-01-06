@@ -100,5 +100,10 @@ func (g *Geometry) Value() (driver.Value, error) {
 		return nil, ewkb.ErrIncompatibleFormat
 	}
 
-	return ewkb.Marshal(converter.ToEWKB())
+	output, err := ewkb.Marshal(converter.ToEWKB())
+	if err != nil {
+		return nil, err
+	}
+
+	return string(output), nil
 }
