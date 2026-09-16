@@ -123,7 +123,12 @@ func Unmarshal(geoShape Unmarshaler, value interface{}) error {
 		return ErrIncompatibleFormat
 	}
 
-	return NewDecoder(bytes.NewBuffer(dataByte)).Decode(geoShape)
+	binData, err := hex.DecodeString(string(dataByte))
+	if err != nil {
+		return err
+	}
+
+	return NewDecoder(bytes.NewBuffer(binData)).Decode(geoShape)
 }
 
 // Decoder is a Extended Well Known Byte decoder.
@@ -134,7 +139,7 @@ type Decoder struct {
 // NewDecoder creates a EWKB decoder.
 func NewDecoder(reader io.Reader) *Decoder {
 	return &Decoder{
-		reader: hex.NewDecoder(reader),
+		reader: reader,
 	}
 }
 
