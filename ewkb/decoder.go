@@ -40,7 +40,7 @@ type ExtendedWellKnownBytes struct {
 func (e ExtendedWellKnownBytes) ReadUint32() (uint32, error) {
 	data := make([]byte, size32bit)
 
-	_, err := e.DataStream.Read(data)
+	_, err := io.ReadFull(e.DataStream, data)
 
 	return e.ByteOrder.Uint32(data), err
 }
@@ -49,7 +49,7 @@ func (e ExtendedWellKnownBytes) ReadUint32() (uint32, error) {
 func (e ExtendedWellKnownBytes) ReadFloat64() (float64, error) {
 	data := make([]byte, size64bit)
 
-	_, err := e.DataStream.Read(data)
+	_, err := io.ReadFull(e.DataStream, data)
 
 	bits := e.ByteOrder.Uint64(data)
 
@@ -60,7 +60,7 @@ func (e ExtendedWellKnownBytes) ReadFloat64() (float64, error) {
 func DecodeHeader(reader io.Reader) (*ExtendedWellKnownBytes, error) {
 	firstByte := make([]byte, size8bit)
 
-	_, err := reader.Read(firstByte)
+	_, err := io.ReadFull(reader, firstByte)
 	if err == io.EOF {
 		return &ExtendedWellKnownBytes{IsNil: true}, nil
 	}
@@ -81,7 +81,7 @@ func DecodeHeader(reader io.Reader) (*ExtendedWellKnownBytes, error) {
 	}
 
 	controlByte := make([]byte, size32bit)
-	if _, err := reader.Read(controlByte); err != nil {
+	if _, err := io.ReadFull(reader, controlByte); err != nil {
 		return nil, err
 	}
 
